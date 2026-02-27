@@ -1,33 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard - Smart Tree Plantation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Smart Tree Plantation</title>
+
 <style>
+
+/* ===== Background ===== */
 body{
   margin:0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(-45deg,#d4fc79,#96e6a1,#38ef7d,#11998e);
-  background-size: 400% 400%;
-  animation: gradientBG 10s ease infinite;
-  text-align:center;
+  background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') no-repeat center center/cover;
+  height:100vh;
+  overflow-x:hidden;
 }
 
-@keyframes gradientBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+/* Dark overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:-1;
 }
 
+/* ===== Header ===== */
 header{
-  background:#0b6623;
-  color:white;
-  padding:10px;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:15px;
+  background:rgba(0,0,0,0.6);
+  color:white;
+  padding:15px;
   animation: slideDown 1s ease;
+}
+
+header img{
+  height:50px;
+}
+
+header h2{
+  margin:0;
 }
 
 @keyframes slideDown{
@@ -35,88 +50,113 @@ header{
   to{transform:translateY(0);}
 }
 
-header img{
-  height:50px;
-}
-
-header div{
-  text-align:left;
-}
-
-header h2{
-  margin:0;
-  font-size:18px;
-}
-
-header p{
-  margin:0;
-  font-size:14px;
+/* ===== Glass Card ===== */
+.container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  margin-top:40px;
 }
 
 .card{
-  background:white;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(12px);
+  padding:30px;
+  border-radius:20px;
   width:350px;
-  margin:20px auto;
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  color:white;
+  box-shadow:0 15px 35px rgba(0,0,0,0.4);
   animation: fadeIn 1.2s ease;
 }
 
 @keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px);}
+  from{opacity:0; transform:translateY(30px);}
   to{opacity:1; transform:translateY(0);}
 }
 
 input{
-  width:90%;
-  padding:8px;
-  margin:8px 0;
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+  outline:none;
 }
 
+/* ===== Buttons ===== */
 button{
-  padding:8px 15px;
-  background:#0b6623;
-  color:white;
+  width:100%;
+  padding:10px;
+  margin-top:10px;
   border:none;
+  border-radius:8px;
+  background:#00c853;
+  color:white;
+  font-weight:bold;
   cursor:pointer;
-  margin:5px;
   transition:0.3s;
 }
 
 button:hover{
-  transform:scale(1.1);
-  background:#145a32;
+  transform:scale(1.05);
+  background:#009624;
 }
+
+.stats{
+  margin-top:15px;
+  font-size:18px;
+}
+
+.nav-buttons{
+  margin-top:15px;
+}
+
+.nav-buttons button{
+  background:#0288d1;
+}
+
+.logout{
+  background:#d32f2f !important;
+}
+
 </style>
 </head>
+
 <body>
 
 <header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="College Logo">
-  <div>
-    <h2>ANDHRA LOYOLA COLLEGE</h2>
-    <p>CSE Department – Green Technology Project</p>
-  </div>
+  <img src="logo.png" alt="College Logo">
+  <h2>ANDHRA LOYOLA COLLEGE – CSE Department</h2>
 </header>
 
-<div class="card">
-  <h3>Plant a Tree</h3>
-  <input type="text" id="treeName" placeholder="Tree Name">
-  <input type="text" id="location" placeholder="Location">
-  <button onclick="addTree()">Plant</button>
+<div class="container">
+  <div class="card">
 
-  <h4>Total Trees: <span id="count">0</span></h4>
-  <h4>Green Points: <span id="points">0</span></h4>
-</div>
+    <h3>Welcome, <span id="user"></span> 🌳</h3>
 
-<div class="card">
-  <button onclick="goLeaderboard()">Leaderboard</button>
-  <button onclick="goCertificate()">Download Certificate</button>
-  <button onclick="logout()">Logout</button>
+    <input type="text" id="treeName" placeholder="Enter Tree Name">
+    <input type="text" id="location" placeholder="Enter Location">
+
+    <button onclick="addTree()">🌱 Plant Tree</button>
+
+    <div class="stats">
+      <p>Total Trees: <strong id="count">0</strong></p>
+      <p>Green Points: <strong id="points">0</strong></p>
+    </div>
+
+    <div class="nav-buttons">
+      <button onclick="goLeaderboard()">🏆 Leaderboard</button>
+      <button onclick="goCertificate()">🎓 Certificate</button>
+      <button class="logout" onclick="logout()">🚪 Logout</button>
+    </div>
+
+  </div>
 </div>
 
 <script>
+
+/* ===== Authentication ===== */
 let currentUser = localStorage.getItem("currentUser");
 
 if(!currentUser){
@@ -125,26 +165,25 @@ if(!currentUser){
 
 document.getElementById("user").innerText = currentUser;
 
+/* ===== Data System ===== */
 let data = JSON.parse(localStorage.getItem("usersData")) || {};
 
 if(!data[currentUser]){
-  data[currentUser] = {
-    trees: 0,
-    points: 0
-  };
-  localStorage.setItem("usersData", JSON.stringify(data));
+  data[currentUser] = { trees:0, points:0 };
 }
 
+/* ===== Update Display ===== */
 function updateDisplay(){
   document.getElementById("count").innerText = data[currentUser].trees;
   document.getElementById("points").innerText = data[currentUser].points;
 }
 
+/* ===== Add Tree ===== */
 function addTree(){
   let name = document.getElementById("treeName").value;
   let location = document.getElementById("location").value;
 
-  if(name === "" || location === ""){
+  if(name==="" || location===""){
     alert("Please fill all details!");
     return;
   }
@@ -154,12 +193,13 @@ function addTree(){
 
   localStorage.setItem("usersData", JSON.stringify(data));
 
-  document.getElementById("treeName").value = "";
-  document.getElementById("location").value = "";
+  document.getElementById("treeName").value="";
+  document.getElementById("location").value="";
 
   updateDisplay();
 }
 
+/* ===== Navigation ===== */
 function goLeaderboard(){
   window.location="leaderboard.html";
 }
@@ -174,6 +214,7 @@ function logout(){
 }
 
 updateDisplay();
+
 </script>
 
 </body>
