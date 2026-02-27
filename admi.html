@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Smart Tree Plantation</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#232526,#414345);
+    color:white;
+    text-align:center;
+}
+
+header{
+    padding:20px;
+    background:#000;
+}
+
+.card{
+    width:500px;
+    margin:40px auto;
+    padding:30px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(15px);
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+input{
+    padding:10px;
+    width:80%;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:25px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
+    margin:5px;
+}
+
+button:hover{
+    background:#16a34a;
+}
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+    background:white;
+    color:black;
+}
+
+th, td{
+    padding:10px;
+    border-bottom:1px solid #ccc;
+}
+
+th{
+    background:#16a34a;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>🌳 Admin Panel – Smart Tree Plantation</h2>
+</header>
+
+<div class="card" id="loginSection">
+
+<h3>Admin Login</h3>
+
+<input type="text" id="adminUser" placeholder="Username">
+<input type="password" id="adminPass" placeholder="Password">
+<br>
+<button onclick="adminLogin()">Login</button>
+
+</div>
+
+<div class="card" id="adminSection" style="display:none;">
+
+<h3>System Data</h3>
+
+<p>Total Trees: <strong id="totalTrees">0</strong></p>
+<p>Total Points: <strong id="totalPoints">0</strong></p>
+
+<table id="userTable">
+<tr>
+<th>Name</th>
+<th>Trees</th>
+<th>Points</th>
+</tr>
+</table>
+
+<br>
+<button onclick="resetData()">Reset All Data</button>
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+
+function adminLogin(){
+    let user = document.getElementById("adminUser").value;
+    let pass = document.getElementById("adminPass").value;
+
+    if(user==="admin" && pass==="1234"){
+        document.getElementById("loginSection").style.display="none";
+        document.getElementById("adminSection").style.display="block";
+        loadData();
+    }else{
+        alert("Invalid Credentials");
+    }
+}
+
+function loadData(){
+    let data = JSON.parse(localStorage.getItem("usersData")) || {};
+    let table = document.getElementById("userTable");
+
+    let totalTrees = 0;
+    let totalPoints = 0;
+
+    Object.keys(data).forEach(name=>{
+        let row = table.insertRow();
+        row.insertCell(0).innerText = name;
+        row.insertCell(1).innerText = data[name].trees;
+        row.insertCell(2).innerText = data[name].points;
+
+        totalTrees += data[name].trees;
+        totalPoints += data[name].points;
+    });
+
+    document.getElementById("totalTrees").innerText = totalTrees;
+    document.getElementById("totalPoints").innerText = totalPoints;
+}
+
+function resetData(){
+    if(confirm("Are you sure you want to delete all data?")){
+        localStorage.removeItem("usersData");
+        localStorage.removeItem("currentUser");
+        alert("All data cleared!");
+        location.reload();
+    }
+}
+
+function logout(){
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>
