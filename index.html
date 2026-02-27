@@ -1,160 +1,256 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Smart Tree Plantation</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tree Plantation | Green Technologies</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: #f4f9f4;
-        }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
 
-        /* HEADER */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-            padding: 20px;
-            color: white;
-            animation: fadeDown 1s ease-in-out;
-        }
+body{
+    min-height:100vh;
+    background:linear-gradient(-45deg,#134e5e,#71b280,#0f2027,#2c5364);
+    background-size:400% 400%;
+    animation: gradientMove 12s ease infinite;
+    color:white;
+    overflow-x:hidden;
+}
 
-        header img {
-            height: 80px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
+/* Animated Background */
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
 
-        /* HERO SECTION */
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                        url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6');
-            background-size: cover;
-            color: white;
-            animation: fadeUp 1.5s ease-in-out;
-        }
+/* Floating Leaves */
+.leaf{
+    position:absolute;
+    font-size:22px;
+    animation: floatLeaf 10s linear infinite;
+    opacity:0.7;
+}
 
-        .hero h1 {
-            font-size: 42px;
-            margin-bottom: 10px;
-        }
+@keyframes floatLeaf{
+    0%{transform:translateY(-10vh) rotate(0deg);}
+    100%{transform:translateY(110vh) rotate(360deg);}
+}
 
-        .hero p {
-            font-size: 18px;
-            max-width: 600px;
-            margin: auto;
-        }
+/* HEADER */
+header{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    padding:20px;
+    background:rgba(0,0,0,0.3);
+    backdrop-filter:blur(12px);
+}
 
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: #2ecc71;
-            color: white;
-            border-radius: 30px;
-            text-decoration: none;
-            transition: 0.3s;
-        }
+header img{
+    height:55px;
+}
 
-        .btn:hover {
-            background: #27ae60;
-            transform: scale(1.1);
-        }
+/* HERO */
+.hero{
+    text-align:center;
+    padding:80px 20px 20px;
+}
 
-        /* STATS */
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-            padding: 60px 20px;
-            text-align: center;
-        }
+.hero h1{
+    font-size:42px;
+    color:#4ade80;
+}
 
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: 0.3s;
-        }
+.typing{
+    font-size:20px;
+    margin-top:15px;
+    height:25px;
+}
 
-        .card:hover {
-            transform: translateY(-10px);
-        }
+/* LOGIN CARD */
+.card{
+    width:360px;
+    margin:40px auto;
+    padding:30px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(20px);
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    animation: fadeUp 1s ease;
+}
 
-        .number {
-            font-size: 36px;
-            font-weight: bold;
-            color: #27ae60;
-        }
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    margin-bottom:15px;
+    outline:none;
+}
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #203a43;
-            color: white;
-        }
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:25px;
+    background:#22c55e;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
 
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+button:hover{
+    background:#16a34a;
+    transform:scale(1.05);
+}
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+/* GLOBAL STATS */
+.stats{
+    margin-top:40px;
+    text-align:center;
+    font-size:20px;
+}
 
-        @media(max-width:768px){
-            .stats { flex-direction: column; gap:20px; }
-        }
-    </style>
+.stats span{
+    color:#4ade80;
+    font-weight:bold;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:20px;
+    margin-top:60px;
+    background:rgba(0,0,0,0.3);
+    font-size:14px;
+    opacity:0.8;
+}
+
+/* Animations */
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(40px);}
+    to{opacity:1; transform:translateY(0);}
+}
+</style>
 </head>
 
 <body>
 
+<!-- Floating Leaves -->
+<div class="leaf" style="left:10%; animation-delay:0s;">🍃</div>
+<div class="leaf" style="left:25%; animation-delay:3s;">🌿</div>
+<div class="leaf" style="left:50%; animation-delay:6s;">🍃</div>
+<div class="leaf" style="left:75%; animation-delay:2s;">🌿</div>
+<div class="leaf" style="left:90%; animation-delay:5s;">🍃</div>
+
 <header>
     <img src="Logo.png">
-    <div>
-        <h1>ANDHRA LOYOLA COLLEGE</h1>
-        <h2>Smart Tree Plantation</h2>
-    </div>
+    <h2>ANDHRA LOYOLA COLLEGE – CSE Department</h2>
 </header>
 
-<section class="hero">
-    <h1>Plant Trees, Save Earth 🌍</h1>
-    <p>Join our green mission and earn Green Points while making the planet healthier.</p>
-    <a href="dashboard.html" class="btn">Start Planting</a>
-</section>
+<div class="hero">
+    <h1>🌳 Smart Tree Plantation</h1>
+    <div class="typing" id="typingText"></div>
+</div>
 
-<section class="stats">
-    <div class="card">
-        <div class="number" id="trees">0</div>
-        <p>Total Trees Planted</p>
-    </div>
+<div class="card">
+    <input type="text" id="username" placeholder="Enter Your Name">
+    <button onclick="login()">Start Plantation</button>
+</div>
 
-    <div class="card">
-        <div class="number" id="points">0</div>
-        <p>Total Green Points</p>
-    </div>
-</section>
+<div class="stats">
+    🌍 Total Trees Planted: <span id="totalTrees">0</span><br><br>
+    💚 Total Green Points: <span id="totalPoints">0</span>
+</div>
 
 <footer>
-    © 2026 Smart Tree Plantation | Developed by CSE Department
+    © 2026 Smart Tree Plantation | Green Technologies Project
 </footer>
 
 <script>
-    let trees = localStorage.getItem("trees") || 0;
-    let points = localStorage.getItem("points") || 0;
 
-    document.getElementById("trees").innerText = trees;
-    document.getElementById("points").innerText = points;
+/* Typing Animation */
+const textArray = [
+"Promoting Sustainable Development 🌍",
+"Encouraging Green Technologies 🌱",
+"Building a Cleaner Future 💚"
+];
+
+let typingIndex = 0;
+let charIndex = 0;
+let currentText = "";
+let isDeleting = false;
+
+function typeEffect(){
+    let fullText = textArray[typingIndex];
+    
+    if(!isDeleting){
+        currentText = fullText.substring(0,charIndex++);
+        if(charIndex > fullText.length){
+            isDeleting = true;
+            setTimeout(typeEffect,1000);
+            return;
+        }
+    }else{
+        currentText = fullText.substring(0,charIndex--);
+        if(charIndex < 0){
+            isDeleting = false;
+            typingIndex = (typingIndex+1) % textArray.length;
+        }
+    }
+
+    document.getElementById("typingText").innerText = currentText;
+    setTimeout(typeEffect,80);
+}
+
+typeEffect();
+
+/* Login */
+function login(){
+    let name = document.getElementById("username").value.trim();
+
+    if(name===""){
+        alert("Please enter your name");
+        return;
+    }
+
+    localStorage.setItem("currentUser", name);
+
+    let data = JSON.parse(localStorage.getItem("usersData")) || {};
+
+    if(!data[name]){
+        data[name] = { trees:0, points:0 };
+        localStorage.setItem("usersData", JSON.stringify(data));
+    }
+
+    window.location="dashboard.html";
+}
+
+/* Global Stats */
+function updateGlobalStats(){
+    let data = JSON.parse(localStorage.getItem("usersData")) || {};
+    let totalTrees = 0;
+    let totalPoints = 0;
+
+    Object.values(data).forEach(user=>{
+        totalTrees += user.trees;
+        totalPoints += user.points;
+    });
+
+    document.getElementById("totalTrees").innerText = totalTrees;
+    document.getElementById("totalPoints").innerText = totalPoints;
+}
+
+updateGlobalStats();
+
 </script>
 
 </body>
