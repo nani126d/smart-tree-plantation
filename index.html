@@ -1,82 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Smart Tree Plantation</title>
+  <title>Smart Tree Plantation System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial;
-      background-color: #e6f7e6;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #d4fc79, #96e6a1);
       text-align: center;
     }
-    h1 {
-      color: darkgreen;
+
+    header {
+      background-color: #0b6623;
+      color: white;
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
-    .container {
+
+    .section {
+      padding: 30px 20px;
+    }
+
+    .card {
       background: white;
       padding: 20px;
       margin: 20px auto;
-      width: 300px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px gray;
+      width: 320px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease-in;
     }
+
     input {
       width: 90%;
-      padding: 8px;
-      margin: 5px;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
+
     button {
       padding: 10px 20px;
-      background-color: green;
+      background-color: #0b6623;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 15px;
     }
+
     button:hover {
-      background-color: darkgreen;
+      background-color: #145a32;
     }
+
     #treeList {
       margin-top: 20px;
+      font-size: 15px;
+    }
+
+    footer {
+      background-color: #0b6623;
+      color: white;
+      padding: 15px;
+      margin-top: 30px;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
     }
   </style>
 </head>
 <body>
 
-  <h1>🌳 Smart Tree Plantation System</h1>
+<header>
+  🌳 Smart Tree Plantation & Monitoring System
+</header>
 
-  <div class="container">
-    <h3>Plant a Tree</h3>
-    <input type="text" id="treeName" placeholder="Tree Name">
-    <input type="text" id="location" placeholder="Location">
-    <button onclick="addTree()">Plant Tree</button>
-  </div>
+<div class="section">
+  <h2>About the Project</h2>
+  <p>This system helps track tree plantation activities digitally and encourages students to contribute towards a greener future.</p>
+</div>
 
-  <h2>Total Trees Planted: <span id="count">0</span></h2>
+<div class="card">
+  <h3>Plant a Tree</h3>
+  <input type="text" id="treeName" placeholder="Enter Tree Name">
+  <input type="text" id="location" placeholder="Enter Location">
+  <button onclick="addTree()">Plant Tree</button>
+</div>
 
-  <div id="treeList"></div>
+<h2>Total Trees Planted: <span id="count">0</span></h2>
 
-  <script>
-    let trees = [];
+<div id="treeList"></div>
 
-    function addTree() {
-      let name = document.getElementById("treeName").value;
-      let location = document.getElementById("location").value;
+<footer>
+  Green Technology Project | CSE Department
+</footer>
 
-      if(name === "" || location === "") {
-        alert("Please fill all fields!");
-        return;
-      }
+<script>
+  let trees = [];
 
-      trees.push({name, location});
-      document.getElementById("count").innerText = trees.length;
+  function addTree() {
+    let name = document.getElementById("treeName").value;
+    let location = document.getElementById("location").value;
 
-      let list = document.getElementById("treeList");
-      list.innerHTML += "<p>🌱 " + name + " planted at " + location + "</p>";
-
-      document.getElementById("treeName").value = "";
-      document.getElementById("location").value = "";
+    if(name === "" || location === "") {
+      alert("Please fill all details!");
+      return;
     }
-  </script>
+
+    trees.push({name, location});
+    document.getElementById("count").innerText = trees.length;
+
+    let list = document.getElementById("treeList");
+    list.innerHTML += "<p>🌱 <b>" + name + "</b> planted at <b>" + location + "</b></p>";
+
+    document.getElementById("treeName").value = "";
+    document.getElementById("location").value = "";
+  }
+</script>
 
 </body>
 </html>
