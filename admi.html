@@ -3,38 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel | Smart Tree Plantation</title>
+<title>Admin Dashboard | Smart Tree Plantation</title>
 
 <style>
 body{
     margin:0;
     font-family:'Segoe UI',sans-serif;
-    background:linear-gradient(135deg,#232526,#414345);
+    background:linear-gradient(135deg,#141e30,#243b55);
     color:white;
-    text-align:center;
 }
 
 header{
     padding:20px;
-    background:#000;
+    text-align:center;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+}
+
+.container{
+    width:95%;
+    margin:30px auto;
 }
 
 .card{
-    width:500px;
-    margin:40px auto;
-    padding:30px;
+    background:rgba(255,255,255,0.08);
+    padding:25px;
     border-radius:20px;
-    background:rgba(255,255,255,0.1);
-    backdrop-filter:blur(15px);
+    backdrop-filter:blur(20px);
     box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    margin-bottom:30px;
 }
 
 input{
     padding:10px;
-    width:80%;
-    margin:10px 0;
+    width:250px;
     border-radius:8px;
     border:none;
+    margin:10px;
 }
 
 button{
@@ -44,7 +49,7 @@ button{
     background:#22c55e;
     color:white;
     cursor:pointer;
-    margin:5px;
+    transition:0.3s;
 }
 
 button:hover{
@@ -53,20 +58,28 @@ button:hover{
 
 table{
     width:100%;
-    margin-top:20px;
     border-collapse:collapse;
+    margin-top:20px;
     background:white;
     color:black;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 th, td{
     padding:10px;
-    border-bottom:1px solid #ccc;
+    border-bottom:1px solid #ddd;
+    text-align:center;
 }
 
 th{
     background:#16a34a;
     color:white;
+}
+
+.stats{
+    font-size:18px;
+    margin-bottom:15px;
 }
 </style>
 </head>
@@ -74,50 +87,63 @@ th{
 <body>
 
 <header>
-<h2>🌳 Admin Panel – Smart Tree Plantation</h2>
+<h2>🌳 Admin Dashboard – Smart Tree Plantation</h2>
 </header>
 
+<div class="container">
+
 <div class="card" id="loginSection">
-
 <h3>Admin Login</h3>
-
 <input type="text" id="adminUser" placeholder="Username">
-<input type="password" id="adminPass" placeholder="Password">
-<br>
+<input type="password" id="adminPass" placeholder="Password"><br>
 <button onclick="adminLogin()">Login</button>
-
 </div>
 
-<div class="card" id="adminSection" style="display:none;">
+<div id="adminPanel" style="display:none;">
 
-<h3>System Data</h3>
+<div class="card">
+<div class="stats">
+Total Trees: <strong id="totalTrees">0</strong> |
+Total Points: <strong id="totalPoints">0</strong>
+</div>
+<button onclick="resetData()">Reset System</button>
+<button onclick="logout()">Logout</button>
+</div>
 
-<p>Total Trees: <strong id="totalTrees">0</strong></p>
-<p>Total Points: <strong id="totalPoints">0</strong></p>
-
-<table id="userTable">
+<div class="card">
+<h3>🌿 Plantation Records</h3>
+<table id="dataTable">
 <tr>
-<th>Name</th>
-<th>Trees</th>
-<th>Points</th>
+<th>User</th>
+<th>Tree Name</th>
+<th>Location</th>
+<th>Date</th>
 </tr>
 </table>
+</div>
 
-<br>
-<button onclick="resetData()">Reset All Data</button>
-<button onclick="logout()">Logout</button>
+</div>
 
 </div>
 
 <script>
 
 function adminLogin(){
+
+    if(!localStorage.getItem("adminUser")){
+        localStorage.setItem("adminUser","admin");
+        localStorage.setItem("adminPass","1234");
+    }
+
+    let storedUser = localStorage.getItem("adminUser");
+    let storedPass = localStorage.getItem("adminPass");
+
     let user = document.getElementById("adminUser").value;
     let pass = document.getElementById("adminPass").value;
 
-    if(user==="admin" && pass==="1234"){
+    if(user===storedUser && pass===storedPass){
         document.getElementById("loginSection").style.display="none";
-        document.getElementById("adminSection").style.display="block";
+        document.getElementById("adminPanel").style.display="block";
         loadData();
     }else{
         alert("Invalid Credentials");
@@ -125,20 +151,26 @@ function adminLogin(){
 }
 
 function loadData(){
+
     let data = JSON.parse(localStorage.getItem("usersData")) || {};
-    let table = document.getElementById("userTable");
+    let table = document.getElementById("dataTable");
 
     let totalTrees = 0;
     let totalPoints = 0;
 
-    Object.keys(data).forEach(name=>{
-        let row = table.insertRow();
-        row.insertCell(0).innerText = name;
-        row.insertCell(1).innerText = data[name].trees;
-        row.insertCell(2).innerText = data[name].points;
+    Object.keys(data).forEach(user=>{
+        totalTrees += data[user].trees;
+        totalPoints += data[user].points;
 
-        totalTrees += data[name].trees;
-        totalPoints += data[name].points;
+        if(data[user].history){
+            data[user].history.forEach(record=>{
+                let row = table.insertRow();
+                row.insertCell(0).innerText = user;
+                row.insertCell(1).innerText = record.tree;
+                row.insertCell(2).innerText = record.location;
+                row.insertCell(3).innerText = record.date;
+            });
+        }
     });
 
     document.getElementById("totalTrees").innerText = totalTrees;
@@ -146,10 +178,9 @@ function loadData(){
 }
 
 function resetData(){
-    if(confirm("Are you sure you want to delete all data?")){
+    if(confirm("Delete all plantation data?")){
         localStorage.removeItem("usersData");
-        localStorage.removeItem("currentUser");
-        alert("All data cleared!");
+        alert("System Reset Complete");
         location.reload();
     }
 }
