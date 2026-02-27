@@ -1,86 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard | Smart Tree Plantation</title>
 
 <style>
-body{
+*{
     margin:0;
-    font-family:'Segoe UI',sans-serif;
-    background:linear-gradient(135deg,#56ab2f,#a8e063);
-    text-align:center;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
 }
 
-/* Header */
-header{
-    background:#1b5e20;
+body{
+    min-height:100vh;
+    background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#134e5e);
+    background-size:400% 400%;
+    animation: gradientMove 12s ease infinite;
     color:white;
-    padding:15px;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+header{
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    justify-content:center;
-    gap:15px;
-    animation: slideDown 0.8s ease;
+    padding:20px 40px;
+    background:rgba(0,0,0,0.3);
+    backdrop-filter:blur(10px);
 }
 
 header img{
     height:50px;
 }
 
-@keyframes slideDown{
-    from{transform:translateY(-100%);}
-    to{transform:translateY(0);}
+.container{
+    width:95%;
+    margin:40px auto;
 }
 
-/* Card */
+/* Glass Card */
 .card{
-    background:white;
-    width:350px;
-    margin:40px auto;
+    background:rgba(255,255,255,0.08);
     padding:25px;
     border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    animation: fadeIn 1s ease;
+    backdrop-filter:blur(20px);
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    margin-bottom:30px;
+    animation: fadeUp 1s ease;
 }
 
-@keyframes fadeIn{
-    from{opacity:0; transform:translateY(30px);}
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(40px);}
     to{opacity:1; transform:translateY(0);}
 }
 
 input{
+    padding:12px;
     width:100%;
-    padding:10px;
-    margin:10px 0;
+    margin-bottom:15px;
     border-radius:8px;
-    border:1px solid #ccc;
+    border:none;
+    outline:none;
 }
 
 button{
-    padding:10px 20px;
-    margin:8px 0;
+    padding:12px 20px;
     border:none;
     border-radius:25px;
-    background:#2e7d32;
+    background:#22c55e;
     color:white;
     cursor:pointer;
     transition:0.3s;
+    margin-right:10px;
 }
 
 button:hover{
+    background:#16a34a;
     transform:scale(1.05);
-    background:#1b5e20;
 }
 
 .stats{
+    display:flex;
+    justify-content:space-around;
     margin-top:15px;
     font-size:18px;
 }
 
-.nav{
+.history{
+    max-height:250px;
+    overflow-y:auto;
     margin-top:15px;
+}
+
+.history-item{
+    background:rgba(255,255,255,0.1);
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:8px;
+}
+
+.nav-buttons{
+    margin-top:20px;
 }
 </style>
 </head>
@@ -88,35 +115,50 @@ button:hover{
 <body>
 
 <header>
-    <img src="Logo.png">
-    <h2>ANDHRA LOYOLA COLLEGE – CSE Department</h2>
+<div style="display:flex; align-items:center; gap:15px;">
+<img src="Logo.png">
+<h3>Smart Tree Plantation</h3>
+</div>
+<div>
+Welcome, <strong id="user"></strong>
+</div>
 </header>
 
-<div class="card">
+<div class="container">
 
-<h3>Welcome, <span id="user"></span> 🌱</h3>
+<div class="card">
+<h2>🌱 Plant a New Tree</h2>
 
 <input type="text" id="treeName" placeholder="Tree Name">
-<input type="text" id="location" placeholder="Location">
+<input type="text" id="location" placeholder="Plantation Location">
 
 <button onclick="addTree()">Plant Tree</button>
-
-<div class="stats">
-    <p>Total Trees: <strong id="count">0</strong></p>
-    <p>Green Points: <strong id="points">0</strong></p>
 </div>
 
-<div class="nav">
-    <button onclick="goLeaderboard()">Leaderboard</button>
-    <button onclick="goCertificate()">Certificate</button>
-    <button onclick="logout()">Logout</button>
+<div class="card">
+<h2>📊 Your Green Impact</h2>
+
+<div class="stats">
+<div>Total Trees 🌳<br><strong id="count">0</strong></div>
+<div>Green Points 💚<br><strong id="points">0</strong></div>
+</div>
+</div>
+
+<div class="card">
+<h2>🌿 Plantation History</h2>
+<div class="history" id="historyList"></div>
+</div>
+
+<div class="card nav-buttons">
+<button onclick="goLeaderboard()">Leaderboard</button>
+<button onclick="goCertificate()">Certificate</button>
+<button onclick="logout()">Logout</button>
 </div>
 
 </div>
 
 <script>
 
-// Get logged in user
 let currentUser = localStorage.getItem("currentUser");
 
 if(!currentUser){
@@ -125,24 +167,37 @@ if(!currentUser){
 
 document.getElementById("user").innerText = currentUser;
 
-// Get all users data
 let data = JSON.parse(localStorage.getItem("usersData")) || {};
 
-// Create user if not exists
 if(!data[currentUser]){
-    data[currentUser] = { trees:0, points:0 };
+    data[currentUser] = { trees:0, points:0, history:[] };
 }
 
-// Update numbers
 function updateDisplay(){
+
     document.getElementById("count").innerText = data[currentUser].trees;
     document.getElementById("points").innerText = data[currentUser].points;
+
+    let historyDiv = document.getElementById("historyList");
+    historyDiv.innerHTML="";
+
+    if(data[currentUser].history){
+        data[currentUser].history.slice().reverse().forEach(record=>{
+            let div = document.createElement("div");
+            div.className="history-item";
+            div.innerHTML = 
+                "<strong>"+record.tree+"</strong><br>" +
+                "Location: "+record.location+"<br>" +
+                "<small>"+record.date+"</small>";
+            historyDiv.appendChild(div);
+        });
+    }
 }
 
-// Add tree
 function addTree(){
-    let name = document.getElementById("treeName").value;
-    let location = document.getElementById("location").value;
+
+    let name = document.getElementById("treeName").value.trim();
+    let location = document.getElementById("location").value.trim();
 
     if(name==="" || location===""){
         alert("Please fill all details!");
@@ -151,6 +206,16 @@ function addTree(){
 
     data[currentUser].trees += 1;
     data[currentUser].points += 10;
+
+    if(!data[currentUser].history){
+        data[currentUser].history=[];
+    }
+
+    data[currentUser].history.push({
+        tree:name,
+        location:location,
+        date:new Date().toLocaleString()
+    });
 
     localStorage.setItem("usersData", JSON.stringify(data));
 
