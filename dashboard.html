@@ -1,230 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | Smart Tree Plantation</title>
+    <title>Dashboard - Smart Tree Plantation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(120deg,#d4fc79,#96e6a1);
+            text-align: center;
+        }
 
-/* ===== Background ===== */
-body{
-  <header style="display:flex; align-items:center; justify-content:center; gap:20px; background:linear-gradient(90deg,#0f2027,#203a43,#2c5364); padding:20px; color:white;">
+        h1 {
+            padding-top: 30px;
+        }
 
-    <img src="Logo.png" alt="College Logo" 
-         style="height:80px; width:auto; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
+        .container {
+            margin-top: 50px;
+        }
 
-    <div>
-        <h1 style="margin:0; font-size:28px;">Your College Name</h1>
-        <h2 style="margin:0; font-weight:300;">Smart Tree Plantation</h2>
-    </div>
+        .card {
+            background: white;
+            padding: 30px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
 
-</header>
-  margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') no-repeat center center/cover;
-  height:100vh;
-  overflow-x:hidden;
-}
+        .card:hover {
+            transform: translateY(-10px);
+        }
 
-/* Dark overlay */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.55);
-  z-index:-1;
-}
+        .number {
+            font-size: 40px;
+            font-weight: bold;
+            color: #27ae60;
+        }
 
-/* ===== Header ===== */
-header{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:15px;
-  background:rgba(0,0,0,0.6);
-  color:white;
-  padding:15px;
-  animation: slideDown 1s ease;
-}
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background: #27ae60;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-header img{
-  height:50px;
-}
+        button:hover {
+            background: #219150;
+            transform: scale(1.1);
+        }
 
-header h2{
-  margin:0;
-}
-
-@keyframes slideDown{
-  from{transform:translateY(-100%);}
-  to{transform:translateY(0);}
-}
-
-/* ===== Glass Card ===== */
-.container{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  margin-top:40px;
-}
-
-.card{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(12px);
-  padding:30px;
-  border-radius:20px;
-  width:350px;
-  color:white;
-  box-shadow:0 15px 35px rgba(0,0,0,0.4);
-  animation: fadeIn 1.2s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(30px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-input{
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border:none;
-  border-radius:8px;
-  outline:none;
-}
-
-/* ===== Buttons ===== */
-button{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  background:#00c853;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-button:hover{
-  transform:scale(1.05);
-  background:#009624;
-}
-
-.stats{
-  margin-top:15px;
-  font-size:18px;
-}
-
-.nav-buttons{
-  margin-top:15px;
-}
-
-.nav-buttons button{
-  background:#0288d1;
-}
-
-.logout{
-  background:#d32f2f !important;
-}
-
-</style>
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-  <img src="logo.png" alt="College Logo">
-  <h2>ANDHRA LOYOLA COLLEGE – CSE Department</h2>
-</header>
+<h1>🌱 Plantation Dashboard</h1>
 
 <div class="container">
-  <div class="card">
 
-    <h3>Welcome, <span id="user"></span> 🌳</h3>
-
-    <input type="text" id="treeName" placeholder="Enter Tree Name">
-    <input type="text" id="location" placeholder="Enter Location">
-
-    <button onclick="addTree()">🌱 Plant Tree</button>
-
-    <div class="stats">
-      <p>Total Trees: <strong id="count">0</strong></p>
-      <p>Green Points: <strong id="points">0</strong></p>
+    <div class="card">
+        <div class="number" id="treeCount">0</div>
+        <p>Your Trees Planted</p>
     </div>
 
-    <div class="nav-buttons">
-      <button onclick="goLeaderboard()">🏆 Leaderboard</button>
-      <button onclick="goCertificate()">🎓 Certificate</button>
-      <button class="logout" onclick="logout()">🚪 Logout</button>
+    <div class="card">
+        <div class="number" id="greenPoints">0</div>
+        <p>Your Green Points</p>
     </div>
 
-  </div>
+    <button onclick="plantTree()">Plant a Tree</button>
+
+    <br>
+    <a href="leaderboard.html">View Leaderboard</a>
+
 </div>
 
 <script>
 
-/* ===== Authentication ===== */
-let currentUser = localStorage.getItem("currentUser");
+    let trees = localStorage.getItem("trees");
+    let points = localStorage.getItem("points");
 
-if(!currentUser){
-  window.location="index.html";
-}
+    if (trees === null) trees = 0;
+    if (points === null) points = 0;
 
-document.getElementById("user").innerText = currentUser;
+    trees = parseInt(trees);
+    points = parseInt(points);
 
-/* ===== Data System ===== */
-let data = JSON.parse(localStorage.getItem("usersData")) || {};
+    document.getElementById("treeCount").innerText = trees;
+    document.getElementById("greenPoints").innerText = points;
 
-if(!data[currentUser]){
-  data[currentUser] = { trees:0, points:0 };
-}
+    function plantTree() {
+        trees += 1;
+        points += 10;
 
-/* ===== Update Display ===== */
-function updateDisplay(){
-  document.getElementById("count").innerText = data[currentUser].trees;
-  document.getElementById("points").innerText = data[currentUser].points;
-}
+        localStorage.setItem("trees", trees);
+        localStorage.setItem("points", points);
 
-/* ===== Add Tree ===== */
-function addTree(){
-  let name = document.getElementById("treeName").value;
-  let location = document.getElementById("location").value;
+        animateValue("treeCount", trees);
+        animateValue("greenPoints", points);
+    }
 
-  if(name==="" || location===""){
-    alert("Please fill all details!");
-    return;
-  }
+    function animateValue(id, end) {
+        let start = end - 1;
+        let duration = 300;
+        let range = end - start;
+        let current = start;
+        let increment = end > start ? 1 : -1;
+        let stepTime = Math.abs(Math.floor(duration / range));
+        let obj = document.getElementById(id);
 
-  data[currentUser].trees += 1;
-  data[currentUser].points += 10;
-
-  localStorage.setItem("usersData", JSON.stringify(data));
-
-  document.getElementById("treeName").value="";
-  document.getElementById("location").value="";
-
-  updateDisplay();
-}
-
-/* ===== Navigation ===== */
-function goLeaderboard(){
-  window.location="leaderboard.html";
-}
-
-function goCertificate(){
-  window.location="certificate.html";
-}
-
-function logout(){
-  localStorage.removeItem("currentUser");
-  window.location="index.html";
-}
-
-updateDisplay();
+        let timer = setInterval(function() {
+            current += increment;
+            obj.innerText = current;
+            if (current == end) {
+                clearInterval(timer);
+            }
+        }, stepTime);
+    }
 
 </script>
 
