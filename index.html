@@ -1,59 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - Smart Tree Plantation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin:0;
-      font-family: Arial;
-      background: linear-gradient(to right,#134e5e,#71b280);
-      text-align:center;
-      color:white;
-    }
-    .box {
-      background:white;
-      color:black;
-      width:300px;
-      margin:100px auto;
-      padding:20px;
-      border-radius:10px;
-    }
-    input {
-      width:90%;
-      padding:8px;
-      margin:10px 0;
-    }
-    button {
-      padding:8px 15px;
-      background:#0b6623;
-      color:white;
-      border:none;
-      cursor:pointer;
-    }
-  </style>
+    <title>Smart Tree Plantation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f9f4;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+            padding: 20px;
+            color: white;
+            animation: fadeDown 1s ease-in-out;
+        }
+
+        header img {
+            height: 80px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6');
+            background-size: cover;
+            color: white;
+            animation: fadeUp 1.5s ease-in-out;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #2ecc71;
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #27ae60;
+            transform: scale(1.1);
+        }
+
+        /* STATS */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #203a43;
+            color: white;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media(max-width:768px){
+            .stats { flex-direction: column; gap:20px; }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>🌳 Smart Tree Plantation System</h1>
+<header>
+    <img src="Logo.png">
+    <div>
+        <h1>Your College Name</h1>
+        <h2>Smart Tree Plantation</h2>
+    </div>
+</header>
 
-<div class="box">
-  <h3>Student Login</h3>
-  <input type="text" id="username" placeholder="Enter your name">
-  <br>
-  <button onclick="login()">Login</button>
-</div>
+<section class="hero">
+    <h1>Plant Trees, Save Earth 🌍</h1>
+    <p>Join our green mission and earn Green Points while making the planet healthier.</p>
+    <a href="dashboard.html" class="btn">Start Planting</a>
+</section>
+
+<section class="stats">
+    <div class="card">
+        <div class="number" id="trees">0</div>
+        <p>Total Trees Planted</p>
+    </div>
+
+    <div class="card">
+        <div class="number" id="points">0</div>
+        <p>Total Green Points</p>
+    </div>
+</section>
+
+<footer>
+    © 2026 Smart Tree Plantation | Developed by CSE Department
+</footer>
 
 <script>
-  function login(){
-    let user=document.getElementById("username").value;
-    if(user===""){
-      alert("Enter your name!");
-      return;
-    }
-    localStorage.setItem("currentUser",user);
-    window.location="dashboard.html";
-  }
+    let trees = localStorage.getItem("trees") || 0;
+    let points = localStorage.getItem("points") || 0;
+
+    document.getElementById("trees").innerText = trees;
+    document.getElementById("points").innerText = points;
 </script>
 
 </body>
