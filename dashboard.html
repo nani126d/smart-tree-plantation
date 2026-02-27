@@ -117,59 +117,63 @@ button:hover{
 </div>
 
 <script>
-  let currentUser = localStorage.getItem("currentUser");
+let currentUser = localStorage.getItem("currentUser");
 
-  if(!currentUser){
-    window.location="index.html";
+if(!currentUser){
+  window.location="index.html";
+}
+
+document.getElementById("user").innerText = currentUser;
+
+let data = JSON.parse(localStorage.getItem("usersData")) || {};
+
+if(!data[currentUser]){
+  data[currentUser] = {
+    trees: 0,
+    points: 0
+  };
+  localStorage.setItem("usersData", JSON.stringify(data));
+}
+
+function updateDisplay(){
+  document.getElementById("count").innerText = data[currentUser].trees;
+  document.getElementById("points").innerText = data[currentUser].points;
+}
+
+function addTree(){
+  let name = document.getElementById("treeName").value;
+  let location = document.getElementById("location").value;
+
+  if(name === "" || location === ""){
+    alert("Please fill all details!");
+    return;
   }
 
-  document.getElementById("user").innerText = currentUser;
+  data[currentUser].trees += 1;
+  data[currentUser].points += 10;
 
-  let data = JSON.parse(localStorage.getItem("usersData")) || {};
+  localStorage.setItem("usersData", JSON.stringify(data));
 
-  if(!data[currentUser]){
-    data[currentUser] = {trees:0, points:0};
-  }
-
-  function updateDisplay(){
-    document.getElementById("count").innerText = data[currentUser].trees;
-    document.getElementById("points").innerText = data[currentUser].points;
-  }
-
-  function addTree(){
-    let name=document.getElementById("treeName").value;
-    let location=document.getElementById("location").value;
-
-    if(name==="" || location===""){
-      alert("Fill all details!");
-      return;
-    }
-
-    data[currentUser].trees += 1;
-    data[currentUser].points += 10;
-
-    localStorage.setItem("usersData", JSON.stringify(data));
-
-    document.getElementById("treeName").value="";
-    document.getElementById("location").value="";
-
-    updateDisplay();
-  }
-
-  function goLeaderboard(){
-    window.location="leaderboard.html";
-  }
-
-  function goCertificate(){
-    window.location="certificate.html";
-  }
-
-  function logout(){
-    localStorage.removeItem("currentUser");
-    window.location="index.html";
-  }
+  document.getElementById("treeName").value = "";
+  document.getElementById("location").value = "";
 
   updateDisplay();
+}
+
+function goLeaderboard(){
+  window.location="leaderboard.html";
+}
+
+function goCertificate(){
+  window.location="certificate.html";
+}
+
+function logout(){
+  localStorage.removeItem("currentUser");
+  window.location="index.html";
+}
+
+updateDisplay();
 </script>
 
 </body>
