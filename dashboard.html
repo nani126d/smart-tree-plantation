@@ -164,121 +164,87 @@ Welcome, <strong id="user"></strong>
 </div>
 
 </div>
-
 <script>
 
 let currentUser = localStorage.getItem("currentUser");
-if(!currentUser){ window.location="index.html"; }
 
-document.getElementById("user").innerText=currentUser;
+if(!currentUser){
+    alert("Login first!");
+    window.location = "index.html";
+}
 
-let data = JSON.parse(localStorage.getItem("usersData")) || {};
+document.getElementById("user").innerText = currentUser;
+
+// Get stored data
+let data = JSON.parse(localStorage.getItem("usersData"));
+
+if(!data){
+    data = {};
+}
+
 if(!data[currentUser]){
-    data[currentUser]={trees:0,points:0,history:[]};
+    data[currentUser] = {
+        trees: 0,
+        points: 0,
+        history: []
+    };
 }
 
-function animateValue(id,start,end,duration){
-    let range=end-start;
-    let startTime=null;
-
-    function step(timestamp){
-        if(!startTime) startTime=timestamp;
-        let progress=timestamp-startTime;
-        let value=Math.min(Math.floor(progress/duration*range+start),end);
-        document.getElementById(id).innerText=value;
-        if(progress<duration) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-}
+// Save initial structure
+localStorage.setItem("usersData", JSON.stringify(data));
 
 function updateDisplay(){
-    animateValue("count",0,data[currentUser].trees,500);
-    animateValue("points",0,data[currentUser].points,500);
 
-    let historyDiv=document.getElementById("historyList");
-    historyDiv.innerHTML="";
-    let dateCount={};
+    document.getElementById("count").innerText = data[currentUser].trees;
+    document.getElementById("points").innerText = data[currentUser].points;
 
-    data[currentUser].history.forEach(record=>{
-        let div=document.createElement("div");
-        div.className="history-item";
-        div.innerHTML="<strong>"+record.tree+"</strong> - "+record.location+"<br><small>"+record.date+"</small>";
+    let historyDiv = document.getElementById("historyList");
+    historyDiv.innerHTML = "";
+
+    data[currentUser].history.forEach(record => {
+
+        let div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+            <strong>${record.tree}</strong><br>
+            Location: ${record.location}<br>
+            <small>${record.date}</small>
+        `;
+
         historyDiv.appendChild(div);
-
-        let date=record.date.split(",")[0];
-        dateCount[date]=(dateCount[date]||0)+1;
     });
-
-    createChart(dateCount);
 }
 
 function addTree(){
-    let name=document.getElementById("treeName").value.trim();
-    let location=document.getElementById("location").value.trim();
 
-    if(name===""||location===""){ alert("Fill all fields"); return; }
+    let name = document.getElementById("treeName").value.trim();
+    let location = document.getElementById("location").value.trim();
 
-    data[currentUser].trees+=1;
-    data[currentUser].points+=10;
+    if(name === "" || location === ""){
+        alert("Please enter tree name and location!");
+        return;
+    }
+
+    data[currentUser].trees += 1;
+    data[currentUser].points += 10;
 
     data[currentUser].history.push({
-        tree:name,
-        location:location,
-        date:new Date().toLocaleString()
+        tree: name,
+        location: location,
+        date: new Date().toLocaleString()
     });
 
-    localStorage.setItem("usersData",JSON.stringify(data));
+    localStorage.setItem("usersData", JSON.stringify(data));
 
-    document.getElementById("treeName").value="";
-    document.getElementById("location").value="";
+    document.getElementById("treeName").value = "";
+    document.getElementById("location").value = "";
 
     updateDisplay();
 }
 
-let chart;
-
-function createChart(dateCount){
-    let ctx=document.getElementById("growthChart").getContext("2d");
-
-    if(chart) chart.destroy();
-
-    chart=new Chart(ctx,{
-        type:"line",
-        data:{
-            labels:Object.keys(dateCount),
-            datasets:[{
-                label:"Trees Planted",
-                data:Object.values(dateCount),
-                borderColor:"#22c55e",
-                tension:0.3
-            }]
-        }
-    });
-}
-
-function toggleMode(){
-    document.body.classList.toggle("light-mode");
-}
-
-function uploadAvatar(event){
-    let reader=new FileReader();
-    reader.onload=function(){
-        document.getElementById("avatar").src=reader.result;
-        localStorage.setItem("avatar_"+currentUser,reader.result);
-    }
-    reader.readAsDataURL(event.target.files[0]);
-}
-
-let savedAvatar=localStorage.getItem("avatar_"+currentUser);
-if(savedAvatar){
-    document.getElementById("avatar").src=savedAvatar;
-}else{
-    document.getElementById("avatar").src="https://i.imgur.com/6VBx3io.png";
-}
-
 function logout(){
     localStorage.removeItem("currentUser");
-    window.location="index.html";
+    window.location = "index.html";
 }
 
 updateDisplay();
