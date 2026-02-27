@@ -3,28 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | Smart Tree Plantation</title>
+<title>Ultimate Dashboard | Smart Tree Plantation</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+:root{
+    --bg-dark: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    --bg-light: linear-gradient(135deg,#e0f7fa,#a5d6a7);
+    --card-dark: rgba(255,255,255,0.08);
+    --card-light: rgba(255,255,255,0.7);
+    --text-dark: white;
+    --text-light: black;
 }
 
 body{
-    min-height:100vh;
-    background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#134e5e);
-    background-size:400% 400%;
-    animation: gradientMove 12s ease infinite;
-    color:white;
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:var(--bg-dark);
+    color:var(--text-dark);
+    transition:0.4s;
 }
 
-@keyframes gradientMove{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+.light-mode{
+    background:var(--bg-light);
+    color:var(--text-light);
 }
 
 header{
@@ -32,7 +34,6 @@ header{
     justify-content:space-between;
     align-items:center;
     padding:20px 40px;
-    background:rgba(0,0,0,0.3);
     backdrop-filter:blur(10px);
 }
 
@@ -42,102 +43,104 @@ header img{
 
 .container{
     width:95%;
-    margin:40px auto;
+    margin:30px auto;
 }
 
-/* Glass Card */
 .card{
-    background:rgba(255,255,255,0.08);
     padding:25px;
     border-radius:20px;
+    margin-bottom:25px;
     backdrop-filter:blur(20px);
-    box-shadow:0 10px 40px rgba(0,0,0,0.4);
-    margin-bottom:30px;
-    animation: fadeUp 1s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    transition:0.4s;
 }
 
-@keyframes fadeUp{
-    from{opacity:0; transform:translateY(40px);}
-    to{opacity:1; transform:translateY(0);}
-}
+.dark .card{ background:var(--card-dark); }
+.light-mode .card{ background:var(--card-light); }
 
 input{
     padding:12px;
     width:100%;
-    margin-bottom:15px;
+    margin-bottom:10px;
     border-radius:8px;
     border:none;
-    outline:none;
 }
 
 button{
-    padding:12px 20px;
+    padding:10px 18px;
     border:none;
     border-radius:25px;
     background:#22c55e;
     color:white;
     cursor:pointer;
-    transition:0.3s;
-    margin-right:10px;
+    margin:5px 0;
 }
 
 button:hover{
     background:#16a34a;
-    transform:scale(1.05);
 }
 
 .stats{
     display:flex;
     justify-content:space-around;
-    margin-top:15px;
     font-size:18px;
 }
 
-.history{
-    max-height:250px;
-    overflow-y:auto;
-    margin-top:15px;
-}
-
 .history-item{
-    background:rgba(255,255,255,0.1);
+    background:rgba(0,0,0,0.1);
     padding:10px;
     border-radius:10px;
     margin-bottom:8px;
 }
 
-.nav-buttons{
-    margin-top:20px;
+.profile{
+    text-align:center;
+}
+
+.avatar{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    margin-bottom:10px;
+}
+
+canvas{
+    max-width:100%;
 }
 </style>
 </head>
 
-<body>
+<body class="dark">
 
 <header>
-<div style="display:flex; align-items:center; gap:15px;">
+<div style="display:flex;align-items:center;gap:10px;">
 <img src="Logo.png">
 <h3>Smart Tree Plantation</h3>
 </div>
+
 <div>
 Welcome, <strong id="user"></strong>
+<button onclick="toggleMode()">Toggle Mode</button>
 </div>
 </header>
 
 <div class="container">
 
-<div class="card">
-<h2>🌱 Plant a New Tree</h2>
-
-<input type="text" id="treeName" placeholder="Tree Name">
-<input type="text" id="location" placeholder="Plantation Location">
-
-<button onclick="addTree()">Plant Tree</button>
+<div class="card profile">
+<img id="avatar" class="avatar">
+<br>
+<input type="file" onchange="uploadAvatar(event)">
 </div>
 
 <div class="card">
-<h2>📊 Your Green Impact</h2>
+<h2>Plant Tree 🌱</h2>
+<input type="text" id="treeName" placeholder="Tree Name">
+<input type="text" id="location" placeholder="Location">
+<button onclick="addTree()">Plant</button>
+</div>
 
+<div class="card">
+<h2>Your Impact</h2>
 <div class="stats">
 <div>Total Trees 🌳<br><strong id="count">0</strong></div>
 <div>Green Points 💚<br><strong id="points">0</strong></div>
@@ -145,13 +148,18 @@ Welcome, <strong id="user"></strong>
 </div>
 
 <div class="card">
-<h2>🌿 Plantation History</h2>
-<div class="history" id="historyList"></div>
+<h2>Growth Chart 📊</h2>
+<canvas id="growthChart"></canvas>
 </div>
 
-<div class="card nav-buttons">
-<button onclick="goLeaderboard()">Leaderboard</button>
-<button onclick="goCertificate()">Certificate</button>
+<div class="card">
+<h2>Plantation History</h2>
+<div id="historyList"></div>
+</div>
+
+<div class="card">
+<button onclick="window.location='leaderboard.html'">Leaderboard</button>
+<button onclick="window.location='certificate.html'">Certificate</button>
 <button onclick="logout()">Logout</button>
 </div>
 
@@ -160,56 +168,58 @@ Welcome, <strong id="user"></strong>
 <script>
 
 let currentUser = localStorage.getItem("currentUser");
+if(!currentUser){ window.location="index.html"; }
 
-if(!currentUser){
-    window.location="index.html";
-}
-
-document.getElementById("user").innerText = currentUser;
+document.getElementById("user").innerText=currentUser;
 
 let data = JSON.parse(localStorage.getItem("usersData")) || {};
-
 if(!data[currentUser]){
-    data[currentUser] = { trees:0, points:0, history:[] };
+    data[currentUser]={trees:0,points:0,history:[]};
+}
+
+function animateValue(id,start,end,duration){
+    let range=end-start;
+    let startTime=null;
+
+    function step(timestamp){
+        if(!startTime) startTime=timestamp;
+        let progress=timestamp-startTime;
+        let value=Math.min(Math.floor(progress/duration*range+start),end);
+        document.getElementById(id).innerText=value;
+        if(progress<duration) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
 }
 
 function updateDisplay(){
+    animateValue("count",0,data[currentUser].trees,500);
+    animateValue("points",0,data[currentUser].points,500);
 
-    document.getElementById("count").innerText = data[currentUser].trees;
-    document.getElementById("points").innerText = data[currentUser].points;
-
-    let historyDiv = document.getElementById("historyList");
+    let historyDiv=document.getElementById("historyList");
     historyDiv.innerHTML="";
+    let dateCount={};
 
-    if(data[currentUser].history){
-        data[currentUser].history.slice().reverse().forEach(record=>{
-            let div = document.createElement("div");
-            div.className="history-item";
-            div.innerHTML = 
-                "<strong>"+record.tree+"</strong><br>" +
-                "Location: "+record.location+"<br>" +
-                "<small>"+record.date+"</small>";
-            historyDiv.appendChild(div);
-        });
-    }
+    data[currentUser].history.forEach(record=>{
+        let div=document.createElement("div");
+        div.className="history-item";
+        div.innerHTML="<strong>"+record.tree+"</strong> - "+record.location+"<br><small>"+record.date+"</small>";
+        historyDiv.appendChild(div);
+
+        let date=record.date.split(",")[0];
+        dateCount[date]=(dateCount[date]||0)+1;
+    });
+
+    createChart(dateCount);
 }
 
 function addTree(){
+    let name=document.getElementById("treeName").value.trim();
+    let location=document.getElementById("location").value.trim();
 
-    let name = document.getElementById("treeName").value.trim();
-    let location = document.getElementById("location").value.trim();
+    if(name===""||location===""){ alert("Fill all fields"); return; }
 
-    if(name==="" || location===""){
-        alert("Please fill all details!");
-        return;
-    }
-
-    data[currentUser].trees += 1;
-    data[currentUser].points += 10;
-
-    if(!data[currentUser].history){
-        data[currentUser].history=[];
-    }
+    data[currentUser].trees+=1;
+    data[currentUser].points+=10;
 
     data[currentUser].history.push({
         tree:name,
@@ -217,7 +227,7 @@ function addTree(){
         date:new Date().toLocaleString()
     });
 
-    localStorage.setItem("usersData", JSON.stringify(data));
+    localStorage.setItem("usersData",JSON.stringify(data));
 
     document.getElementById("treeName").value="";
     document.getElementById("location").value="";
@@ -225,12 +235,45 @@ function addTree(){
     updateDisplay();
 }
 
-function goLeaderboard(){
-    window.location="leaderboard.html";
+let chart;
+
+function createChart(dateCount){
+    let ctx=document.getElementById("growthChart").getContext("2d");
+
+    if(chart) chart.destroy();
+
+    chart=new Chart(ctx,{
+        type:"line",
+        data:{
+            labels:Object.keys(dateCount),
+            datasets:[{
+                label:"Trees Planted",
+                data:Object.values(dateCount),
+                borderColor:"#22c55e",
+                tension:0.3
+            }]
+        }
+    });
 }
 
-function goCertificate(){
-    window.location="certificate.html";
+function toggleMode(){
+    document.body.classList.toggle("light-mode");
+}
+
+function uploadAvatar(event){
+    let reader=new FileReader();
+    reader.onload=function(){
+        document.getElementById("avatar").src=reader.result;
+        localStorage.setItem("avatar_"+currentUser,reader.result);
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+let savedAvatar=localStorage.getItem("avatar_"+currentUser);
+if(savedAvatar){
+    document.getElementById("avatar").src=savedAvatar;
+}else{
+    document.getElementById("avatar").src="https://i.imgur.com/6VBx3io.png";
 }
 
 function logout(){
