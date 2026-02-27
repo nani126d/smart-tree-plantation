@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Certificate - Smart Tree Plantation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{
+      margin:0;
+      font-family:Georgia, serif;
+      background:linear-gradient(to right,#56ab2f,#a8e063);
+      text-align:center;
+    }
+    .certificate{
+      background:white;
+      width:80%;
+      margin:40px auto;
+      padding:40px;
+      border:10px solid #0b6623;
+      border-radius:15px;
+    }
+    h1{
+      font-size:40px;
+      color:#0b6623;
+    }
+    h2{
+      margin-top:30px;
+    }
+    .btn{
+      padding:10px 20px;
+      background:#0b6623;
+      color:white;
+      border:none;
+      cursor:pointer;
+      margin:20px;
+      font-size:16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="certificate">
+  <h1>🌳 Certificate of Appreciation 🌳</h1>
+
+  <h2>This is proudly awarded to</h2>
+  <h2 id="studentName"></h2>
+
+  <p>For actively contributing to the</p>
+  <h3>Smart Tree Plantation & Green Technology Initiative</h3>
+
+  <p>Total Trees Planted: <b id="treeCount"></b></p>
+  <p>Green Points Earned: <b id="pointCount"></b></p>
+
+  <p>Date: <span id="date"></span></p>
+
+  <br>
+  <button class="btn" onclick="download()">Download as PDF</button>
+  <button class="btn" onclick="goBack()">Back to Dashboard</button>
+</div>
+
+<script>
+  let currentUser = localStorage.getItem("currentUser");
+  let data = JSON.parse(localStorage.getItem("usersData")) || {};
+
+  if(!currentUser){
+    window.location="index.html";
+  }
+
+  document.getElementById("studentName").innerText = currentUser;
+  document.getElementById("treeCount").innerText = data[currentUser]?.trees || 0;
+  document.getElementById("pointCount").innerText = data[currentUser]?.points || 0;
+  document.getElementById("date").innerText = new Date().toLocaleDateString();
+
+  function download(){
+    window.print();   // User chooses "Save as PDF"
+  }
+
+  function goBack(){
+    window.location="dashboard.html";
+  }
+</script>
+
+</body>
+</html>
