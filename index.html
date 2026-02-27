@@ -5,36 +5,76 @@
   <style>
     body {
       font-family: Arial;
-      text-align: center;
       background-color: #e6f7e6;
+      text-align: center;
     }
     h1 {
-      color: green;
+      color: darkgreen;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+    }
+    input {
+      width: 90%;
+      padding: 8px;
+      margin: 5px;
     }
     button {
-      padding: 12px 25px;
+      padding: 10px 20px;
       background-color: green;
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
       background-color: darkgreen;
     }
+    #treeList {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>🌳 Smart Tree Plantation</h1>
-  <p>Plant Trees. Save Nature. Build a Greener Future.</p>
+  <h1>🌳 Smart Tree Plantation System</h1>
 
-  <button onclick="plantTree()">Plant Now</button>
+  <div class="container">
+    <h3>Plant a Tree</h3>
+    <input type="text" id="treeName" placeholder="Tree Name">
+    <input type="text" id="location" placeholder="Location">
+    <button onclick="addTree()">Plant Tree</button>
+  </div>
+
+  <h2>Total Trees Planted: <span id="count">0</span></h2>
+
+  <div id="treeList"></div>
 
   <script>
-    function plantTree() {
-      alert("🌱 Thank you for planting a tree!");
+    let trees = [];
+
+    function addTree() {
+      let name = document.getElementById("treeName").value;
+      let location = document.getElementById("location").value;
+
+      if(name === "" || location === "") {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      trees.push({name, location});
+      document.getElementById("count").innerText = trees.length;
+
+      let list = document.getElementById("treeList");
+      list.innerHTML += "<p>🌱 " + name + " planted at " + location + "</p>";
+
+      document.getElementById("treeName").value = "";
+      document.getElementById("location").value = "";
     }
   </script>
 
