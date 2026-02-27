@@ -1,82 +1,121 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Certificate - Smart Tree Plantation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body{
-      margin:0;
-      font-family:Georgia, serif;
-      background:linear-gradient(to right,#56ab2f,#a8e063);
-      text-align:center;
-    }
-    .certificate{
-      background:white;
-      width:80%;
-      margin:40px auto;
-      padding:40px;
-      border:10px solid #0b6623;
-      border-radius:15px;
-    }
-    h1{
-      font-size:40px;
-      color:#0b6623;
-    }
-    h2{
-      margin-top:30px;
-    }
-    .btn{
-      padding:10px 20px;
-      background:#0b6623;
-      color:white;
-      border:none;
-      cursor:pointer;
-      margin:20px;
-      font-size:16px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Green Certificate</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:'Georgia',serif;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    text-align:center;
+    padding:30px;
+    color:white;
+}
+
+.certificate{
+    background:white;
+    color:black;
+    padding:40px;
+    border-radius:20px;
+    width:700px;
+    margin:auto;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:scale(0.8);}
+    to{opacity:1; transform:scale(1);}
+}
+
+h1{
+    color:#2e7d32;
+    font-size:32px;
+}
+
+h2{
+    margin:20px 0;
+}
+
+.logo{
+    height:70px;
+}
+
+button{
+    margin-top:25px;
+    padding:10px 20px;
+    border:none;
+    border-radius:25px;
+    background:#2e7d32;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#1b5e20;
+}
+</style>
 </head>
+
 <body>
 
-<div class="certificate">
-  <h1>🌳 Certificate of Appreciation 🌳</h1>
+<div id="certificateContent" class="certificate">
 
-  <h2>This is proudly awarded to</h2>
-  <h2 id="studentName"></h2>
+<img src="Logo.png" class="logo"><br>
 
-  <p>For actively contributing to the</p>
-  <h3>Smart Tree Plantation & Green Technology Initiative</h3>
+<h1>Certificate of Green Contribution 🌳</h1>
 
-  <p>Total Trees Planted: <b id="treeCount"></b></p>
-  <p>Green Points Earned: <b id="pointCount"></b></p>
+<p>This certificate is proudly presented to</p>
 
-  <p>Date: <span id="date"></span></p>
+<h2 id="studentName"></h2>
 
-  <br>
-  <button class="btn" onclick="download()">Download as PDF</button>
-  <button class="btn" onclick="goBack()">Back to Dashboard</button>
+<p>For successfully planting</p>
+
+<h2 id="treeCount"></h2>
+
+<p>and earning</p>
+
+<h2 id="greenPoints"></h2>
+
+<p>in the Smart Tree Plantation Initiative.</p>
+
+<p>Issued by: Your College Name – CSE Department</p>
+
 </div>
 
+<button onclick="downloadPDF()">Download Certificate PDF</button>
+<br>
+<button onclick="goBack()">Back to Dashboard</button>
+
 <script>
-  let currentUser = localStorage.getItem("currentUser");
-  let data = JSON.parse(localStorage.getItem("usersData")) || {};
 
-  if(!currentUser){
+let currentUser = localStorage.getItem("currentUser");
+
+if(!currentUser){
     window.location="index.html";
-  }
+}
 
-  document.getElementById("studentName").innerText = currentUser;
-  document.getElementById("treeCount").innerText = data[currentUser]?.trees || 0;
-  document.getElementById("pointCount").innerText = data[currentUser]?.points || 0;
-  document.getElementById("date").innerText = new Date().toLocaleDateString();
+let data = JSON.parse(localStorage.getItem("usersData")) || {};
 
-  function download(){
-    window.print();   // User chooses "Save as PDF"
-  }
+document.getElementById("studentName").innerText = currentUser;
+document.getElementById("treeCount").innerText = data[currentUser].trees + " Trees 🌳";
+document.getElementById("greenPoints").innerText = data[currentUser].points + " Green Points 💚";
 
-  function goBack(){
+function downloadPDF(){
+    let element = document.getElementById("certificateContent");
+    html2pdf().from(element).save(currentUser + "_Green_Certificate.pdf");
+}
+
+function goBack(){
     window.location="dashboard.html";
-  }
+}
+
 </script>
 
 </body>
