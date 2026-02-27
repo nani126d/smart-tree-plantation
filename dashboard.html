@@ -1,75 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Tree Plantation - Dashboard</title>
+<title>Dashboard | Smart Tree Plantation</title>
 
 <style>
-body{
+*{
     margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#134e5e);
+    background-size:400% 400%;
+    animation: gradientMove 12s ease infinite;
     color:white;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 
 header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:15px 30px;
+    padding:20px 40px;
     background:rgba(0,0,0,0.3);
+    backdrop-filter:blur(10px);
 }
 
 header img{
-    height:45px;
+    height:50px;
 }
 
 .container{
-    width:90%;
-    max-width:900px;
+    width:95%;
     margin:40px auto;
 }
 
+/* Glass Card */
 .card{
-    background:rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:25px;
+    background:rgba(255,255,255,0.08);
+    padding:25px;
+    border-radius:20px;
+    backdrop-filter:blur(20px);
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    margin-bottom:30px;
+    animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(40px);}
+    to{opacity:1; transform:translateY(0);}
 }
 
 input{
+    padding:12px;
     width:100%;
-    padding:10px;
-    margin-bottom:10px;
+    margin-bottom:15px;
+    border-radius:8px;
     border:none;
-    border-radius:6px;
+    outline:none;
 }
 
 button{
-    padding:10px 20px;
+    padding:12px 20px;
     border:none;
-    border-radius:20px;
+    border-radius:25px;
     background:#22c55e;
     color:white;
     cursor:pointer;
+    transition:0.3s;
+    margin-right:10px;
 }
 
 button:hover{
     background:#16a34a;
+    transform:scale(1.05);
 }
 
 .stats{
     display:flex;
     justify-content:space-around;
     margin-top:15px;
+    font-size:18px;
+}
+
+.history{
+    max-height:250px;
+    overflow-y:auto;
+    margin-top:15px;
 }
 
 .history-item{
-    background:rgba(255,255,255,0.15);
-    padding:8px;
-    border-radius:8px;
+    background:rgba(255,255,255,0.1);
+    padding:10px;
+    border-radius:10px;
     margin-bottom:8px;
+}
+
+.nav-buttons{
+    margin-top:20px;
 }
 </style>
 </head>
@@ -77,35 +115,44 @@ button:hover{
 <body>
 
 <header>
-<div style="display:flex;align-items:center;gap:10px;">
+<div style="display:flex; align-items:center; gap:15px;">
 <img src="Logo.png">
 <h3>Smart Tree Plantation</h3>
 </div>
 <div>
-Welcome, <span id="username"></span>
+Welcome, <strong id="user"></strong>
 </div>
 </header>
 
 <div class="container">
 
 <div class="card">
-<h2>Plant New Tree 🌱</h2>
+<h2>🌱 Plant a New Tree</h2>
+
 <input type="text" id="treeName" placeholder="Tree Name">
-<input type="text" id="treeLocation" placeholder="Location">
-<button id="plantBtn">Plant Tree</button>
+<input type="text" id="location" placeholder="Plantation Location">
+
+<button onclick="addTree()">Plant Tree</button>
 </div>
 
 <div class="card">
-<h2>Your Impact 📊</h2>
+<h2>📊 Your Green Impact</h2>
+
 <div class="stats">
-<div>Total Trees 🌳<br><strong id="treeCount">0</strong></div>
-<div>Green Points 💚<br><strong id="greenPoints">0</strong></div>
+<div>Total Trees 🌳<br><strong id="count">0</strong></div>
+<div>Green Points 💚<br><strong id="points">0</strong></div>
 </div>
 </div>
 
 <div class="card">
-<h2>Plantation History 🌿</h2>
-<div id="history"></div>
+<h2>🌿 Plantation History</h2>
+<div class="history" id="historyList"></div>
+</div>
+
+<div class="card nav-buttons">
+<button onclick="goLeaderboard()">Leaderboard</button>
+<button onclick="goCertificate()">Certificate</button>
+<button onclick="logout()">Logout</button>
 </div>
 
 </div>
@@ -115,83 +162,83 @@ Welcome, <span id="username"></span>
 let currentUser = localStorage.getItem("currentUser");
 
 if(!currentUser){
-    alert("Please login first.");
     window.location="index.html";
 }
 
-document.getElementById("username").innerText = currentUser;
+document.getElementById("user").innerText = currentUser;
 
-let usersData = JSON.parse(localStorage.getItem("usersData"));
+let data = JSON.parse(localStorage.getItem("usersData")) || {};
 
-if(!usersData){
-    usersData = {};
+if(!data[currentUser]){
+    data[currentUser] = { trees:0, points:0, history:[] };
 }
 
-if(!usersData[currentUser]){
-    usersData[currentUser] = {
-        trees:0,
-        points:0,
-        history:[]
-    };
+function updateDisplay(){
+
+    document.getElementById("count").innerText = data[currentUser].trees;
+    document.getElementById("points").innerText = data[currentUser].points;
+
+    let historyDiv = document.getElementById("historyList");
+    historyDiv.innerHTML="";
+
+    if(data[currentUser].history){
+        data[currentUser].history.slice().reverse().forEach(record=>{
+            let div = document.createElement("div");
+            div.className="history-item";
+            div.innerHTML = 
+                "<strong>"+record.tree+"</strong><br>" +
+                "Location: "+record.location+"<br>" +
+                "<small>"+record.date+"</small>";
+            historyDiv.appendChild(div);
+        });
+    }
 }
 
-localStorage.setItem("usersData", JSON.stringify(usersData));
-
-function updateUI(){
-
-    document.getElementById("treeCount").innerText =
-        usersData[currentUser].trees;
-
-    document.getElementById("greenPoints").innerText =
-        usersData[currentUser].points;
-
-    let historyDiv = document.getElementById("history");
-    historyDiv.innerHTML = "";
-
-    usersData[currentUser].history.forEach(item => {
-
-        let div = document.createElement("div");
-        div.className="history-item";
-        div.innerHTML =
-            "<strong>"+item.name+"</strong><br>" +
-            "Location: "+item.location+"<br>" +
-            "<small>"+item.date+"</small>";
-
-        historyDiv.appendChild(div);
-    });
-}
-
-function plantTree(){
+function addTree(){
 
     let name = document.getElementById("treeName").value.trim();
-    let location = document.getElementById("treeLocation").value.trim();
+    let location = document.getElementById("location").value.trim();
 
     if(name==="" || location===""){
-        alert("Please enter tree name and location");
+        alert("Please fill all details!");
         return;
     }
 
-    usersData[currentUser].trees += 1;
-    usersData[currentUser].points += 10;
+    data[currentUser].trees += 1;
+    data[currentUser].points += 10;
 
-    usersData[currentUser].history.push({
-        name:name,
+    if(!data[currentUser].history){
+        data[currentUser].history=[];
+    }
+
+    data[currentUser].history.push({
+        tree:name,
         location:location,
         date:new Date().toLocaleString()
     });
 
-    localStorage.setItem("usersData", JSON.stringify(usersData));
+    localStorage.setItem("usersData", JSON.stringify(data));
 
     document.getElementById("treeName").value="";
-    document.getElementById("treeLocation").value="";
+    document.getElementById("location").value="";
 
-    updateUI();
+    updateDisplay();
 }
 
-document.getElementById("plantBtn")
-.addEventListener("click", plantTree);
+function goLeaderboard(){
+    window.location="leaderboard.html";
+}
 
-updateUI();
+function goCertificate(){
+    window.location="certificate.html";
+}
+
+function logout(){
+    localStorage.removeItem("currentUser");
+    window.location="index.html";
+}
+
+updateDisplay();
 
 </script>
 
