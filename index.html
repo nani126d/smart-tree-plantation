@@ -101,7 +101,22 @@
 </footer>
 
 <script>
-  let trees = [];
+  let trees = JSON.parse(localStorage.getItem("trees")) || [];
+
+  function displayTrees() {
+    let list = document.getElementById("treeList");
+    list.innerHTML = "";
+    document.getElementById("count").innerText = trees.length;
+
+    trees.forEach((tree, index) => {
+      list.innerHTML += `
+        <p>
+          🌱 <b>${tree.name}</b> planted at <b>${tree.location}</b>
+          <button onclick="deleteTree(${index})" style="margin-left:10px;background:red;">X</button>
+        </p>
+      `;
+    });
+  }
 
   function addTree() {
     let name = document.getElementById("treeName").value;
@@ -113,14 +128,22 @@
     }
 
     trees.push({name, location});
-    document.getElementById("count").innerText = trees.length;
-
-    let list = document.getElementById("treeList");
-    list.innerHTML += "<p>🌱 <b>" + name + "</b> planted at <b>" + location + "</b></p>";
+    localStorage.setItem("trees", JSON.stringify(trees));
 
     document.getElementById("treeName").value = "";
     document.getElementById("location").value = "";
+
+    displayTrees();
   }
+
+  function deleteTree(index) {
+    trees.splice(index, 1);
+    localStorage.setItem("trees", JSON.stringify(trees));
+    displayTrees();
+  }
+
+  // Load data when page opens
+  window.onload = displayTrees;
 </script>
 
 </body>
