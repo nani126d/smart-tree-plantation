@@ -17,25 +17,21 @@ header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:15px 30px;
+    padding:15px 20px;
     background:rgba(0,0,0,0.3);
-}
-
-header img{
-    height:45px;
 }
 
 .container{
     width:90%;
     max-width:900px;
-    margin:40px auto;
+    margin:30px auto;
 }
 
 .card{
     background:rgba(255,255,255,0.1);
     padding:20px;
     border-radius:12px;
-    margin-bottom:25px;
+    margin-bottom:20px;
 }
 
 input{
@@ -53,17 +49,10 @@ button{
     background:#22c55e;
     color:white;
     cursor:pointer;
-    margin-top:5px;
 }
 
 button:hover{
     background:#16a34a;
-}
-
-.stats{
-    display:flex;
-    justify-content:space-around;
-    margin-top:15px;
 }
 
 .history-item{
@@ -73,8 +62,8 @@ button:hover{
     margin-bottom:10px;
 }
 
-img.preview{
-    width:150px;
+.preview{
+    width:120px;
     border-radius:8px;
     margin-top:8px;
 }
@@ -84,37 +73,30 @@ img.preview{
 <body>
 
 <header>
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="Logo.png">
-<h3>Smart Tree Plantation</h3>
-</div>
-<div>
-Welcome, <span id="username"></span>
-</div>
+<h3>🌱 Smart Tree Plantation</h3>
+<div>Welcome, <span id="username"></span></div>
 </header>
 
 <div class="container">
 
 <div class="card">
-<h2>Plant a Tree 🌱</h2>
+<h2>Plant a Tree</h2>
 
 <input type="text" id="treeName" placeholder="Enter Tree Name">
 
 <input type="file" id="treeImage" accept="image/*">
 
-<button onclick="captureLocation()">Capture Live Location 📍</button>
-<p id="locationStatus" style="color:lightgreen;"></p>
+<button type="button" onclick="captureLocation()">Capture Location 📍</button>
+<p id="locationStatus"></p>
 
-<button id="plantBtn">Plant Tree</button>
+<button type="button" onclick="plantTree()">Plant Tree 🌳</button>
 
 </div>
 
 <div class="card">
-<h2>Your Impact 🌿</h2>
-<div class="stats">
-<div>Total Trees 🌳<br><strong id="treeCount">0</strong></div>
-<div>Green Points 💚<br><strong id="greenPoints">0</strong></div>
-</div>
+<h2>Your Impact</h2>
+<p>Total Trees: <strong id="treeCount">0</strong></p>
+<p>Green Points: <strong id="greenPoints">0</strong></p>
 </div>
 
 <div class="card">
@@ -129,8 +111,8 @@ Welcome, <span id="username"></span>
 let currentUser = localStorage.getItem("currentUser");
 
 if(!currentUser){
-    alert("Please login first.");
-    window.location="index.html";
+    alert("Please login first!");
+    window.location = "index.html";
 }
 
 document.getElementById("username").innerText = currentUser;
@@ -144,6 +126,7 @@ if(!usersData[currentUser]){
 let latitude = null;
 let longitude = null;
 
+// Capture Location
 function captureLocation(){
 
     if(!navigator.geolocation){
@@ -151,7 +134,7 @@ function captureLocation(){
         return;
     }
 
-    document.getElementById("locationStatus").innerText = "Capturing location...";
+    document.getElementById("locationStatus").innerText = "Getting location...";
 
     navigator.geolocation.getCurrentPosition(
         function(position){
@@ -159,37 +142,48 @@ function captureLocation(){
             longitude = position.coords.longitude;
 
             document.getElementById("locationStatus").innerText =
-                "Location Captured ✅ (" +
-                latitude.toFixed(4) + ", " +
-                longitude.toFixed(4) + ")";
+            "Location Captured ✅";
         },
-        function(){
-            alert("Please allow location access!");
+        function(error){
+            alert("Allow location permission!");
         }
     );
 }
 
-document.getElementById("plantBtn")
-.addEventListener("click", function(){
+// Plant Tree Function
+function plantTree(){
 
     let name = document.getElementById("treeName").value.trim();
-    let imageFile = document.getElementById("treeImage").files[0];
+    let imageInput = document.getElementById("treeImage");
+    let imageFile = imageInput.files[0];
 
-    if(!name || !imageFile || latitude===null){
-        alert("Please fill all fields and capture location!");
+    if(name === ""){
+        alert("Enter tree name!");
+        return;
+    }
+
+    if(!imageFile){
+        alert("Upload plant image!");
+        return;
+    }
+
+    if(latitude === null || longitude === null){
+        alert("Please capture location first!");
         return;
     }
 
     let reader = new FileReader();
 
-    reader.onload = function(e){
+    reader.onload = function(event){
+
+        let imageData = event.target.result;
 
         usersData[currentUser].trees += 1;
         usersData[currentUser].points += 10;
 
         usersData[currentUser].history.push({
             name:name,
-            image:e.target.result,
+            image:imageData,
             lat:latitude,
             lon:longitude,
             points:10,
@@ -200,12 +194,20 @@ document.getElementById("plantBtn")
 
         alert("Tree Planted Successfully 🌳");
 
-        location.reload();
+        // Reset form
+        document.getElementById("treeName").value="";
+        imageInput.value="";
+        document.getElementById("locationStatus").innerText="";
+        latitude=null;
+        longitude=null;
+
+        updateUI();
     };
 
     reader.readAsDataURL(imageFile);
-});
+}
 
+// Update UI
 function updateUI(){
 
     document.getElementById("treeCount").innerText =
@@ -215,20 +217,20 @@ function updateUI(){
         usersData[currentUser].points;
 
     let historyDiv = document.getElementById("history");
-    historyDiv.innerHTML = "";
+    historyDiv.innerHTML="";
 
     usersData[currentUser].history.forEach(tree => {
 
         historyDiv.innerHTML += `
-            <div class="history-item">
-                <strong>${tree.name}</strong><br>
-                Points: ${tree.points}<br>
-                <a target="_blank"
-                href="https://www.google.com/maps?q=${tree.lat},${tree.lon}">
-                View Location 📍</a><br>
-                <img src="${tree.image}" class="preview">
-                <br><small>${tree.date}</small>
-            </div>
+        <div class="history-item">
+            <strong>${tree.name}</strong><br>
+            Points: ${tree.points}<br>
+            <a target="_blank"
+            href="https://www.google.com/maps?q=${tree.lat},${tree.lon}">
+            View Location 📍</a><br>
+            <img src="${tree.image}" class="preview"><br>
+            <small>${tree.date}</small>
+        </div>
         `;
     });
 }
