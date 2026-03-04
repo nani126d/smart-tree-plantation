@@ -1,84 +1,131 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Tree Plantation - Certificate</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body{
-      font-family: Arial; 
-      text-align:center; 
-      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      color:white;
-      padding:20px;
-    }
-    h1{ margin-top:20px; animation: fadeIn 2s;}
-    .card{
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      padding:20px;
-      margin:20px auto;
-      width:90%;
-      max-width:500px;
-      border-radius:15px;
-      box-shadow:0 0 20px rgba(0,255,0,0.4);
-      animation: slideIn 1.5s;
-    }
-    input{ padding:10px; width:80%; margin:10px 0; border-radius:8px; border:none;}
-    button{ padding:10px 20px; border:none; border-radius:8px; background:#00c853; color:white; cursor:pointer; margin:5px;}
-    button:hover{ background:#00e676; transform:scale(1.05);}
-    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-    @keyframes slideIn{from{transform: translateY(50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-  </style>
+<meta charset="UTF-8">
+<title>Smart Tree Plantation Certificate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  text-align: center;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: white;
+  padding: 20px;
+}
+h1 {
+  margin-top: 20px;
+  font-size: 32px;
+  letter-spacing: 1px;
+}
+.card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  margin: 30px auto;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0,255,0,0.5);
+  animation: slideIn 1.5s;
+}
+button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 12px;
+  background: #00c853;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+button:hover {
+  background: #00e676;
+  transform: scale(1.05);
+}
+@keyframes slideIn {
+  from {transform: translateY(50px); opacity:0;}
+  to {transform: translateY(0); opacity:1;}
+}
+</style>
 </head>
 <body>
 
 <h1>🌳 Smart Tree Plantation Certificate</h1>
 
 <div class="card">
-  <input type="text" id="userName" placeholder="Enter Your Name"><br>
-  <input type="text" id="treeName" placeholder="Enter Tree Name"><br>
-  <button onclick="generateCertificate()">Generate Certificate</button>
+  <p id="certText">Loading your certificate...</p>
+  <button id="downloadBtn" style="display:none;">Download PDF</button>
 </div>
 
-<!-- jsPDF Library -->
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <script>
-function generateCertificate(){
-  const { jsPDF } = window.jspdf;
-  const userName = document.getElementById("userName").value;
-  const treeName = document.getElementById("treeName").value;
-  const date = new Date().toLocaleDateString();
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
+  authDomain: "smart-tree-plantation-alc.firebaseapp.com",
+  projectId: "smart-tree-plantation-alc",
+  storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
+  messagingSenderId: "1079228357775",
+  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+};
 
-  if(userName === "" || treeName === ""){
-    alert("Please enter all details");
-    return;
-  }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  const doc = new jsPDF();
+// Fetch latest planted tree for user
+// If you want, you can change 'currentUserName' dynamically
+const currentUserName = prompt("Enter your name to generate certificate");
 
-  doc.setFontSize(24);
-  doc.text("🌳 Smart Tree Plantation 🌳", 105, 30, null, null, "center");
+db.collection("plants")
+  .where("user","==",currentUserName)
+  .orderBy("date","desc")
+  .limit(1)
+  .get()
+  .then(snapshot=>{
+    if(snapshot.empty){
+      document.getElementById("certText").innerText = "No tree found for user: "+currentUserName;
+      return;
+    }
+    const data = snapshot.docs[0].data();
+    const treeName = data.tree;
+    const points = data.points;
+    const date = data.date;
 
-  doc.setFontSize(20);
-  doc.text("Certificate of Participation", 105, 50, null, null, "center");
+    const text = `
+      This certificate is proudly presented to
+      ${currentUserName}
+      for planting the tree "${treeName}"
+      on ${date}
+      and earning ${points} Green Points!
+    `;
+    document.getElementById("certText").innerText = text;
+    document.getElementById("downloadBtn").style.display = "inline-block";
 
-  doc.setFontSize(16);
-  doc.text(`This certificate is proudly presented to`, 105, 70, null, null, "center");
+    document.getElementById("downloadBtn").onclick = function(){
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(24);
+      doc.text("🌳 Smart Tree Plantation 🌳", 105, 30, null, null, "center");
+      doc.setFontSize(20);
+      doc.text("Certificate of Participation", 105, 50, null, null, "center");
+      doc.setFontSize(16);
+      doc.text(`Presented to ${currentUserName}`, 105, 70, null, null, "center");
+      doc.text(`For planting the tree "${treeName}"`, 105, 85, null, null, "center");
+      doc.text(`Date: ${date}`, 105, 100, null, null, "center");
+      doc.text(`Green Points Earned: ${points}`, 105, 115, null, null, "center");
+      doc.text("Thank you for contributing to a greener planet!", 105, 140, null, null, "center");
+      doc.save(`Certificate_${currentUserName}_${treeName}.pdf`);
+    };
+  })
+  .catch(err=>{
+    document.getElementById("certText").innerText = "Error fetching data: "+err;
+  });
 
-  doc.setFontSize(22);
-  doc.text(`${userName}`, 105, 85, null, null, "center");
-
-  doc.setFontSize(16);
-  doc.text(`for planting the tree "${treeName}"`, 105, 100, null, null, "center");
-
-  doc.text(`Date: ${date}`, 105, 120, null, null, "center");
-
-  doc.setFontSize(12);
-  doc.text("Thank you for contributing to a greener planet!", 105, 140, null, null, "center");
-
-  doc.save(`Certificate_${userName}_${treeName}.pdf`);
-}
 </script>
-
 </body>
 </html>
