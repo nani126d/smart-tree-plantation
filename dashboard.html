@@ -3,43 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>Smart Tree Dashboard</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:white;
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
 }
 .container{
-    width:90%;
-    max-width:800px;
-    margin:30px auto;
+width:90%;
+max-width:800px;
+margin:30px auto;
 }
 .card{
-    background:rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
+background:rgba(255,255,255,0.1);
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
 }
 input{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border:none;
-    border-radius:6px;
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:none;
+border-radius:6px;
 }
 button{
-    padding:10px 20px;
-    border:none;
-    border-radius:20px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:#22c55e;
+color:white;
+cursor:pointer;
 }
-button:hover{
-    background:#16a34a;
+button:active{
+transform:scale(0.95);
 }
 </style>
 </head>
@@ -55,16 +55,16 @@ button:hover{
 
 <input type="file" id="treeImage" accept="image/*">
 
-<button id="locationBtn">Capture Location 📍</button>
-<p id="locationStatus"></p>
+<button id="captureBtn">Capture Location 📍</button>
+<p id="locText"></p>
 
 <button id="plantBtn">Plant Tree 🌳</button>
 
 </div>
 
 <div class="card">
-<h3>Total Trees: <span id="treeCount">0</span></h3>
-<h3>Green Points: <span id="greenPoints">0</span></h3>
+<h3>Total Trees: <span id="totalTrees">0</span></h3>
+<h3>Green Points: <span id="totalPoints">0</span></h3>
 </div>
 
 <div class="card">
@@ -75,132 +75,135 @@ button:hover{
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-
-let currentUser = localStorage.getItem("currentUser");
-
-if(!currentUser){
-    alert("Login first!");
-    window.location = "index.html";
-    return;
-}
-
-let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
-
-if(!usersData[currentUser]){
-    usersData[currentUser] = { trees:0, points:0, history:[] };
-}
 
 let latitude = null;
 let longitude = null;
 
-// Capture Location
-document.getElementById("locationBtn").addEventListener("click", function(){
+let currentUser = localStorage.getItem("currentUser");
 
-    if(!navigator.geolocation){
-        alert("Geolocation not supported");
-        return;
-    }
+if(!currentUser){
+alert("Login first!");
+window.location="index.html";
+}
 
-    document.getElementById("locationStatus").innerText = "Getting location...";
+// Load or create user
+let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
 
-    navigator.geolocation.getCurrentPosition(
-        function(position){
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
+if(!usersData[currentUser]){
+usersData[currentUser] = { trees:0, points:0, history:[] };
+}
 
-            document.getElementById("locationStatus").innerText = 
-            "Location Captured ✅";
-        },
-        function(){
-            alert("Please allow location permission!");
-        }
-    );
+// LOCATION
+document.getElementById("captureBtn").onclick = function(){
+
+if(!navigator.geolocation){
+alert("Geolocation not supported");
+return;
+}
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+latitude = position.coords.latitude;
+longitude = position.coords.longitude;
+
+document.getElementById("locText").innerText =
+"Location Captured ✅";
+
+}, function(){
+alert("Allow location permission");
+});
+};
+
+// PLANT TREE
+document.getElementById("plantBtn").onclick = function(){
+
+let name = document.getElementById("treeName").value.trim();
+let file = document.getElementById("treeImage").files[0];
+
+if(!name){
+alert("Enter tree name");
+return;
+}
+
+if(!file){
+alert("Upload image");
+return;
+}
+
+if(latitude === null){
+alert("Capture location first");
+return;
+}
+
+// 🔥 SIMPLE STORAGE (NO FileReader issue)
+let reader = new FileReader();
+
+reader.onloadend = function(){
+
+try{
+
+usersData[currentUser].trees += 1;
+usersData[currentUser].points += 10;
+
+usersData[currentUser].history.push({
+name:name,
+image:reader.result,
+lat:latitude,
+lon:longitude,
+points:10,
+date:new Date().toLocaleString()
 });
 
-// Plant Tree
-document.getElementById("plantBtn").addEventListener("click", function(){
+localStorage.setItem("usersData", JSON.stringify(usersData));
 
-    let name = document.getElementById("treeName").value.trim();
-    let fileInput = document.getElementById("treeImage");
-    let imageFile = fileInput.files[0];
+alert("Tree Planted Successfully 🌳");
 
-    if(name === ""){
-        alert("Enter tree name");
-        return;
-    }
+// Reset
+document.getElementById("treeName").value="";
+document.getElementById("treeImage").value="";
+document.getElementById("locText").innerText="";
+latitude=null;
+longitude=null;
 
-    if(!imageFile){
-        alert("Upload plant image");
-        return;
-    }
+updateUI();
 
-    if(latitude === null){
-        alert("Capture location first");
-        return;
-    }
+}catch(err){
+alert("Storage Full or Error Occurred");
+console.log(err);
+}
 
-    let reader = new FileReader();
+};
 
-    reader.onload = function(e){
+reader.readAsDataURL(file);
 
-        usersData[currentUser].trees += 1;
-        usersData[currentUser].points += 10;
+};
 
-        usersData[currentUser].history.push({
-            name:name,
-            image:e.target.result,
-            lat:latitude,
-            lon:longitude,
-            points:10,
-            date:new Date().toLocaleString()
-        });
-
-        localStorage.setItem("usersData", JSON.stringify(usersData));
-
-        alert("Tree Planted Successfully 🌳");
-
-        // Reset
-        document.getElementById("treeName").value="";
-        fileInput.value="";
-        document.getElementById("locationStatus").innerText="";
-        latitude=null;
-        longitude=null;
-
-        updateUI();
-    };
-
-    reader.readAsDataURL(imageFile);
-});
-
-// Update UI
+// UPDATE UI
 function updateUI(){
 
-    document.getElementById("treeCount").innerText =
-        usersData[currentUser].trees;
+document.getElementById("totalTrees").innerText =
+usersData[currentUser].trees;
 
-    document.getElementById("greenPoints").innerText =
-        usersData[currentUser].points;
+document.getElementById("totalPoints").innerText =
+usersData[currentUser].points;
 
-    let historyDiv = document.getElementById("history");
-    historyDiv.innerHTML="";
+let historyDiv = document.getElementById("history");
+historyDiv.innerHTML="";
 
-    usersData[currentUser].history.forEach(tree => {
-
-        historyDiv.innerHTML += `
-        <p>
-        🌳 ${tree.name} - ${tree.points} Points<br>
-        <a target="_blank"
-        href="https://www.google.com/maps?q=${tree.lat},${tree.lon}">
-        View Location</a>
-        </p>
-        `;
-    });
+usersData[currentUser].history.forEach(tree=>{
+historyDiv.innerHTML += `
+<p>
+🌳 ${tree.name} - ${tree.points} Points<br>
+<a target="_blank"
+href="https://www.google.com/maps?q=${tree.lat},${tree.lon}">
+View Location</a>
+</p>
+`;
+});
 }
 
 updateUI();
 
-});
 </script>
 
 </body>
