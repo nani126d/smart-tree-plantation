@@ -110,88 +110,55 @@ Welcome, <span id="username"></span>
 
 </div>
 
-<script>
+<script type="module">
 
-let currentUser = localStorage.getItem("currentUser");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-if(!currentUser){
-    alert("Please login first.");
-    window.location="index.html";
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
+  authDomain: "smart-tree-plantation-alc.firebaseapp.com",
+  projectId: "smart-tree-plantation-alc",
+  storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
+  messagingSenderId: "1079228357775",
+  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+};
 
-document.getElementById("username").innerText = currentUser;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-let usersData = JSON.parse(localStorage.getItem("usersData"));
+window.plantTree = async function() {
 
-if(!usersData){
-    usersData = {};
-}
+  const treeName = document.getElementById("treeName").value;
 
-if(!usersData[currentUser]){
-    usersData[currentUser] = {
-        trees:0,
-        points:0,
-        history:[]
-    };
-}
+  if(treeName === ""){
+    alert("Enter tree name");
+    return;
+  }
 
-localStorage.setItem("usersData", JSON.stringify(usersData));
+  navigator.geolocation.getCurrentPosition(async (position)=>{
 
-function updateUI(){
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
 
-    document.getElementById("treeCount").innerText =
-        usersData[currentUser].trees;
-
-    document.getElementById("greenPoints").innerText =
-        usersData[currentUser].points;
-
-    let historyDiv = document.getElementById("history");
-    historyDiv.innerHTML = "";
-
-    usersData[currentUser].history.forEach(item => {
-
-        let div = document.createElement("div");
-        div.className="history-item";
-        div.innerHTML =
-            "<strong>"+item.name+"</strong><br>" +
-            "Location: "+item.location+"<br>" +
-            "<small>"+item.date+"</small>";
-
-        historyDiv.appendChild(div);
-    });
-}
-
-function plantTree(){
-
-    let name = document.getElementById("treeName").value.trim();
-    let location = document.getElementById("treeLocation").value.trim();
-
-    if(name==="" || location===""){
-        alert("Please enter tree name and location");
-        return;
-    }
-
-    usersData[currentUser].trees += 1;
-    usersData[currentUser].points += 10;
-
-    usersData[currentUser].history.push({
-        name:name,
-        location:location,
-        date:new Date().toLocaleString()
+    await addDoc(collection(db,"plants"),{
+      tree: treeName,
+      lat: lat,
+      lon: lon,
+      points: 10,
+      date: new Date().toLocaleString()
     });
 
-    localStorage.setItem("usersData", JSON.stringify(usersData));
+    alert("Tree Planted Successfully 🌳");
 
     document.getElementById("treeName").value="";
-    document.getElementById("treeLocation").value="";
 
-    updateUI();
+  }, ()=>{
+    alert("Location permission denied");
+  });
+
 }
-
-document.getElementById("plantBtn")
-.addEventListener("click", plantTree);
-
-updateUI();
 
 </script>
 
