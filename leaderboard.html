@@ -3,84 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaderboard | Smart Tree Plantation</title>
+<title>Leaderboard - Smart Tree Plantation</title>
 
 <style>
 body{
     margin:0;
-    font-family:'Segoe UI',sans-serif;
+    font-family:Arial, sans-serif;
     background:linear-gradient(135deg,#134e5e,#71b280);
-    text-align:center;
     color:white;
 }
 
-/* Header */
 header{
-    background:#0f2027;
-    padding:15px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:15px;
+    text-align:center;
+    padding:20px;
+    font-size:24px;
+    font-weight:bold;
 }
 
-header img{
-    height:50px;
+.container{
+    width:90%;
+    max-width:800px;
+    margin:30px auto;
 }
 
-/* Card */
-.card{
-    background:white;
-    color:black;
-    width:400px;
-    margin:40px auto;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    animation: fadeIn 1s ease;
-}
-
-@keyframes fadeIn{
-    from{opacity:0; transform:translateY(40px);}
-    to{opacity:1; transform:translateY(0);}
-}
-
-h2{
-    margin-bottom:20px;
-}
-
-table{
+.table{
     width:100%;
     border-collapse:collapse;
+    background:rgba(255,255,255,0.1);
+    border-radius:10px;
+    overflow:hidden;
 }
 
-th, td{
-    padding:10px;
-    border-bottom:1px solid #ccc;
+.table th,
+.table td{
+    padding:12px;
+    text-align:center;
 }
 
-th{
-    background:#2e7d32;
-    color:white;
+.table th{
+    background:rgba(0,0,0,0.3);
 }
 
-tr:hover{
-    background:#f1f1f1;
+.table tr:nth-child(even){
+    background:rgba(255,255,255,0.05);
+}
+
+.rank1{
+    background:gold !important;
+    color:black;
+    font-weight:bold;
+}
+
+.rank2{
+    background:silver !important;
+    color:black;
+    font-weight:bold;
+}
+
+.rank3{
+    background:#cd7f32 !important;
+    color:black;
+    font-weight:bold;
+}
+
+.back-btn{
+    display:block;
+    text-align:center;
+    margin-top:20px;
 }
 
 button{
-    margin-top:20px;
     padding:10px 20px;
     border:none;
-    border-radius:25px;
-    background:#2e7d32;
+    border-radius:20px;
+    background:#22c55e;
     color:white;
     cursor:pointer;
-    transition:0.3s;
 }
 
 button:hover{
-    background:#1b5e20;
+    background:#16a34a;
 }
 </style>
 </head>
@@ -88,56 +90,77 @@ button:hover{
 <body>
 
 <header>
-    <img src="Logo.png">
-    <h2>ANDHRA LOYOLA COLLEGE – CSE Department</h2>
+🏆 Global Leaderboard 🌍
 </header>
 
-<div class="card">
+<div class="container">
 
-<h2>🏆 Green Leaderboard</h2>
-
-<table id="leaderboardTable">
+<table class="table">
+<thead>
 <tr>
 <th>Rank</th>
-<th>Name</th>
-<th>Points</th>
+<th>User</th>
+<th>Total Trees 🌳</th>
+<th>Green Points 💚</th>
 </tr>
+</thead>
+
+<tbody id="leaderboardBody">
+</tbody>
 </table>
 
-<button onclick="goBack()">Back to Dashboard</button>
+<div class="back-btn">
+<button onclick="window.location='dashboard.html'">
+Back to Dashboard
+</button>
+</div>
 
 </div>
 
 <script>
 
-let data = JSON.parse(localStorage.getItem("usersData")) || {};
-
-let table = document.getElementById("leaderboardTable");
+// Get all users data
+let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
 
 // Convert object to array
-let users = Object.keys(data).map(name => {
-    return { name: name, points: data[name].points };
-});
+let usersArray = [];
 
-// Sort by points descending
-users.sort((a,b)=> b.points - a.points);
+for(let user in usersData){
+    usersArray.push({
+        name:user,
+        trees:usersData[user].trees,
+        points:usersData[user].points
+    });
+}
 
-// Add rows
-users.forEach((user,index)=>{
-    let medal="";
-    if(index===0) medal="🥇";
-    else if(index===1) medal="🥈";
-    else if(index===2) medal="🥉";
-    else medal=index+1;
+// Sort by highest points
+usersArray.sort((a,b) => b.points - a.points);
 
-    let row = table.insertRow();
-    row.insertCell(0).innerText = medal;
-    row.insertCell(1).innerText = user.name;
-    row.insertCell(2).innerText = user.points;
-});
+let tableBody = document.getElementById("leaderboardBody");
 
-function goBack(){
-    window.location="dashboard.html";
+if(usersArray.length === 0){
+    tableBody.innerHTML =
+    `<tr><td colspan="4">No participants yet 🌱</td></tr>`;
+}
+else{
+
+    usersArray.forEach((user,index)=>{
+
+        let rowClass = "";
+
+        if(index===0) rowClass="rank1";
+        else if(index===1) rowClass="rank2";
+        else if(index===2) rowClass="rank3";
+
+        tableBody.innerHTML += `
+        <tr class="${rowClass}">
+            <td>${index+1}</td>
+            <td>${user.name}</td>
+            <td>${user.trees}</td>
+            <td>${user.points}</td>
+        </tr>
+        `;
+    });
 }
 
 </script>
