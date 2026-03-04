@@ -37,6 +37,7 @@
       align-items: center;
       z-index: 1000;
       transition: 0.5s;
+      backdrop-filter: blur(10px);
     }
 
     nav.scrolled {
@@ -140,16 +141,21 @@
       text-align: center;
     }
 
+    .stat-card {
+      background: var(--glass);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.3s;
+    }
     .stat-card i {
       font-size: 3rem;
       color: var(--primary-green);
       margin-bottom: 20px;
     }
-
     .stat-card h3 { font-size: 2.5rem; margin-bottom: 10px; }
     .stat-card p { color: #8a99af; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
 
-    /* --- Features Section --- */
     .features {
       padding: 100px 8%;
       background: #0e2218;
@@ -179,7 +185,6 @@
     .feature-box h4 { margin-bottom: 15px; font-size: 1.3rem; }
     .feature-box p { color: #ccc; line-height: 1.6; font-size: 0.9rem; }
 
-    /* --- Footer --- */
     footer {
       padding: 60px 8% 30px;
       background: #07110c;
@@ -191,7 +196,6 @@
     .social-links a { color: white; font-size: 1.5rem; transition: 0.3s; }
     .social-links a:hover { color: var(--primary-green); }
 
-    /* Scroll Indicator */
     .scroll-down {
       position: absolute;
       bottom: 30px;
@@ -240,17 +244,17 @@
   <section class="stats-section" id="about">
     <div class="stat-card" data-aos="fade-up">
       <i class="fas fa-tree"></i>
-      <h3>1,240+</h3>
+      <h3 id="totalTrees">0</h3>
       <p>Trees Registered</p>
     </div>
     <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
       <i class="fas fa-users"></i>
-      <h3>500+</h3>
+      <h3 id="totalVolunteers">0</h3>
       <p>Active Volunteers</p>
     </div>
     <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
       <i class="fas fa-cloud-sun"></i>
-      <h3>12.5t</h3>
+      <h3 id="co2Offset">0t</h3>
       <p>CO2 Offset Est.</p>
     </div>
   </section>
@@ -288,21 +292,45 @@
   </footer>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
-    AOS.init({
-      once: true,
-      duration: 1000
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
+      authDomain: "smart-tree-plantation-alc.firebaseapp.com",
+      projectId: "smart-tree-plantation-alc",
+      storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
+      messagingSenderId: "1079228357775",
+      appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Live Stats
+    db.collection("plants").onSnapshot(snapshot => {
+      document.getElementById("totalTrees").innerText = snapshot.size;
+
+      const volunteers = new Set();
+      let co2 = 0;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        volunteers.add(data.user);
+        co2 += (data.co2 || 0);
+      });
+      document.getElementById("totalVolunteers").innerText = volunteers.size;
+      document.getElementById("co2Offset").innerText = co2.toFixed(1) + 't';
     });
+
+    AOS.init({ once:true, duration:1000 });
 
     // Navbar Scroll Effect
     window.addEventListener('scroll', function() {
       const nav = document.getElementById('navbar');
-      if (window.scrollY > 50) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
+      if (window.scrollY > 50) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
     });
   </script>
+
 </body>
 </html>
