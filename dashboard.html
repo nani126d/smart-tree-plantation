@@ -1,138 +1,161 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Smart Tree Plantation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e6ffe6;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tree Dashboard</title>
 
-        .container {
-            width: 60%;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            margin-top: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px gray;
-        }
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
+text-align:center;
+}
 
-        h2 {
-            text-align: center;
-            color: green;
-        }
+.container{
+width:90%;
+max-width:800px;
+margin:20px auto;
+}
 
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 8px 0;
-        }
+.card{
+background:rgba(255,255,255,0.1);
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+}
 
-        button {
-            background-color: green;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
+input{
+width:90%;
+padding:10px;
+margin:10px 0;
+border:none;
+border-radius:6px;
+}
 
-        button:hover {
-            background-color: darkgreen;
-        }
+button{
+padding:10px 20px;
+border:none;
+border-radius:25px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+font-size:16px;
+margin:10px;
+}
 
-        #dashboard {
-            display: none;
-        }
-
-        .points {
-            font-size: 18px;
-            font-weight: bold;
-            color: darkgreen;
-        }
-    </style>
+.stats{
+display:flex;
+justify-content:space-around;
+margin-top:20px;
+}
+.stat-box{
+background:rgba(0,0,0,0.3);
+padding:15px;
+border-radius:10px;
+width:40%;
+}
+</style>
 </head>
-
 <body>
 
-<div class="container" id="registration">
-    <h2>User Registration</h2>
+<div class="container">
 
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="email" id="email" placeholder="Enter your email" required>
-    <input type="password" id="password" placeholder="Enter your password" required>
+<h1>🌳 Smart Tree Plantation</h1>
 
-    <button onclick="registerUser()">Register</button>
+<div class="stats">
+<div class="stat-box">
+<h3>Total Trees</h3>
+<h2 id="totalTrees">0</h2>
 </div>
 
-
-<div class="container" id="dashboard">
-    <h2>Plantation Dashboard</h2>
-
-    <p class="points">Total Points: <span id="points">0</span></p>
-
-    <h3>Add Plantation</h3>
-
-    <input type="text" id="treeName" placeholder="Tree Name" required>
-    <input type="file" id="treeImage" accept="image/*" required>
-    <textarea id="experience" placeholder="Share your plantation experience" rows="4"></textarea>
-
-    <button onclick="addPlantation()">Submit Plantation</button>
-
-    <h3>My Plantations</h3>
-    <div id="plantationList"></div>
+<div class="stat-box">
+<h3>Total Green Points</h3>
+<h2 id="totalPoints">0</h2>
+</div>
 </div>
 
+<div class="card">
+<h2>Plant a Tree 🌱</h2>
+
+<input type="text" id="treeName" placeholder="Enter Tree Name">
+
+<br>
+<button onclick="captureLocation()">Capture Location 📍</button>
+<p id="locationText"></p>
+
+<button onclick="plantTree()">Plant Tree 🌳</button>
+</div>
+
+</div>
 
 <script>
-    let totalPoints = 0;
 
-    function registerUser() {
-        let name = document.getElementById("name").value;
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+let latitude = null;
+let longitude = null;
 
-        if(name === "" || email === "" || password === "") {
-            alert("Please fill all details!");
-            return;
-        }
+// Load saved data
+let plants = JSON.parse(localStorage.getItem("plants")) || [];
 
-        alert("Registration Successful!");
+updateStats();
 
-        document.getElementById("registration").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-    }
+// Capture GPS
+function captureLocation(){
+navigator.geolocation.getCurrentPosition(
+(position)=>{
+latitude = position.coords.latitude;
+longitude = position.coords.longitude;
+document.getElementById("locationText").innerText =
+"Location Captured ✅ ("+latitude.toFixed(4)+", "+longitude.toFixed(4)+")";
+},
+()=>{
+alert("Location permission denied");
+}
+);
+}
 
-    function addPlantation() {
-        let treeName = document.getElementById("treeName").value;
-        let experience = document.getElementById("experience").value;
+// Plant Tree
+function plantTree(){
 
-        if(treeName === "" || experience === "") {
-            alert("Please fill all plantation details!");
-            return;
-        }
+let name = document.getElementById("treeName").value;
 
-        totalPoints += 10;
-        document.getElementById("points").innerText = totalPoints;
+if(name === "" || latitude === null){
+alert("Please enter tree name and capture location!");
+return;
+}
 
-        let plantationDiv = document.createElement("div");
-        plantationDiv.innerHTML = `
-            <hr>
-            <h4>Tree: ${treeName}</h4>
-            <p><b>Experience:</b> ${experience}</p>
-            <p><b>Points Earned:</b> 10</p>
-        `;
+let newPlant = {
+name: name,
+lat: latitude,
+lon: longitude,
+points: 10,
+date: new Date().toLocaleString()
+};
 
-        document.getElementById("plantationList").appendChild(plantationDiv);
+plants.push(newPlant);
+localStorage.setItem("plants", JSON.stringify(plants));
 
-        document.getElementById("treeName").value = "";
-        document.getElementById("experience").value = "";
+alert("Tree Planted Successfully 🌳💚");
 
-        alert("Plantation Added! You earned 10 points 🌱");
-    }
+document.getElementById("treeName").value = "";
+document.getElementById("locationText").innerText = "";
+latitude = null;
+longitude = null;
+
+updateStats();
+}
+
+// Update stats
+function updateStats(){
+let totalTrees = plants.length;
+let totalPoints = totalTrees * 10;
+
+document.getElementById("totalTrees").innerText = totalTrees;
+document.getElementById("totalPoints").innerText = totalPoints;
+}
+
 </script>
 
 </body>
