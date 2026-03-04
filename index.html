@@ -1,229 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Tree Plantation | Andhra Loyola College</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication | ALC Smart Plantation</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-green: #2ecc71;
+      --deep-forest: #0b1a13;
+      --glass: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Cinematic Mesh Gradient */
+      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #0b1a13);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      overflow: hidden;
+      color: white;
+    }
 
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(-45deg,#134e5e,#71b280,#0f2027,#2c5364);
-background-size:400% 400%;
-animation:gradientBG 12s ease infinite;
-overflow:hidden;
-color:white;
-}
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-@keyframes gradientBG{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-}
+    /* Animated Nature Particles */
+    .leaf-particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--primary-green);
+      border-radius: 50% 0 50% 0;
+      opacity: 0.3;
+      filter: blur(1px);
+      animation: fall 10s linear infinite;
+    }
 
-/* Floating circles */
-.circle{
-position:absolute;
-border-radius:50%;
-background:rgba(255,255,255,0.1);
-animation:float 10s infinite ease-in-out;
-}
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.3; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
 
-.circle:nth-child(1){
-width:200px;
-height:200px;
-top:10%;
-left:10%;
-}
+    /* Glassmorphism Card */
+    .auth-card {
+      position: relative;
+      background: var(--glass);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      padding: 50px 40px;
+      border-radius: 30px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      z-index: 10;
+      animation: cardEntrance 1s ease-out;
+    }
 
-.circle:nth-child(2){
-width:150px;
-height:150px;
-bottom:15%;
-right:10%;
-animation-duration:14s;
-}
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
 
-.circle:nth-child(3){
-width:100px;
-height:100px;
-top:60%;
-left:70%;
-animation-duration:18s;
-}
+    .logo-icon {
+      font-size: 50px;
+      color: var(--primary-green);
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.5));
+    }
 
-@keyframes float{
-0%{transform:translateY(0px);}
-50%{transform:translateY(-40px);}
-100%{transform:translateY(0px);}
-}
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px; }
+    h2 { font-size: 14px; font-weight: 300; color: #ccc; margin-bottom: 35px; text-transform: uppercase; letter-spacing: 2px; }
 
-/* Main Card */
-.container{
-position:relative;
-background:rgba(255,255,255,0.1);
-padding:40px;
-border-radius:20px;
-backdrop-filter:blur(15px);
-box-shadow:0 15px 35px rgba(0,0,0,0.4);
-text-align:center;
-width:350px;
-animation:fadeIn 1.5s ease;
-}
+    .input-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
 
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(30px);}
-to{opacity:1; transform:translateY(0);}
-}
+    .input-container i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-green);
+      font-size: 18px;
+    }
 
-h1{
-font-size:22px;
-margin-bottom:5px;
-}
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 15px;
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
 
-h2{
-font-size:18px;
-margin-bottom:20px;
-font-weight:300;
-}
+    input:focus {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary-green);
+      box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+    }
 
-input{
-width:100%;
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:10px;
-outline:none;
-}
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 15px;
+      background: var(--primary-green);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+    }
 
-button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:25px;
-background:#22c55e;
-color:white;
-font-weight:600;
-cursor:pointer;
-transition:0.3s;
-}
+    button:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px rgba(46, 204, 113, 0.4);
+    }
 
-button:hover{
-background:#16a34a;
-transform:scale(1.05);
-}
+    .toggle-text {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #aaa;
+    }
 
-.toggle{
-margin-top:15px;
-font-size:14px;
-cursor:pointer;
-color:#bbf7d0;
-}
+    .toggle-text span {
+      color: var(--primary-green);
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
 
-.footer{
-position:absolute;
-bottom:15px;
-font-size:12px;
-opacity:0.8;
-}
-</style>
+    .toggle-text span:hover { text-decoration: underline; color: #fff; }
+
+    .footer-brand {
+      position: absolute;
+      bottom: 20px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      text-transform: uppercase;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="circle"></div>
-<div class="circle"></div>
-<div class="circle"></div>
+  <script>
+    for (let i = 0; i < 15; i++) {
+      let leaf = document.createElement('div');
+      leaf.className = 'leaf-particle';
+      leaf.style.left = Math.random() * 100 + 'vw';
+      leaf.style.animationDelay = Math.random() * 10 + 's';
+      leaf.style.left = Math.random() * 100 + 'vw';
+      document.body.appendChild(leaf);
+    }
+  </script>
 
-<div class="container">
+  <div class="auth-card">
+    <div class="logo-icon">
+      <i class="fas fa-seedling"></i>
+    </div>
+    
+    <h1 id="title">Join the Green Movement</h1>
+    <h2 id="subtitle">ALC CSE Department</h2>
 
-<h1>🌳 Smart Tree Plantation</h1>
-<h2>Andhra Loyola College – CSE Department</h2>
+    <div id="formArea">
+      <div class="input-container">
+        <i class="fas fa-user"></i>
+        <input type="text" id="name" placeholder="Full Name">
+      </div>
+      <div class="input-container">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Create Password">
+      </div>
+      <button id="mainBtn" onclick="handleAuth()">Register Account</button>
+    </div>
 
-<div id="formArea">
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="register()">Register</button>
-</div>
+    <div class="toggle-text">
+      <p id="toggleMsg">Already a member? <span onclick="toggleForm()">Sign In</span></p>
+    </div>
+  </div>
 
-<div class="toggle" onclick="toggleForm()">Already registered? Sign In</div>
+  <div class="footer-brand">
+    © 2026 Andhra Loyola College | Smart Campus Initiative
+  </div>
 
-</div>
+  <script>
+    let isLogin = false;
 
-<div class="footer">
-© 2026 Andhra Loyola College | Green Technology Initiative
-</div>
+    function toggleForm() {
+      const title = document.getElementById("title");
+      const subtitle = document.getElementById("subtitle");
+      const nameInput = document.getElementById("name");
+      const passInput = document.getElementById("password");
+      const mainBtn = document.getElementById("mainBtn");
+      const toggleMsg = document.getElementById("toggleMsg");
 
-<script>
+      // Add a fade-out effect during transition
+      document.getElementById("formArea").style.opacity = "0";
+      
+      setTimeout(() => {
+        if (!isLogin) {
+          title.innerText = "Welcome Back";
+          subtitle.innerText = "Log in to your green dashboard";
+          nameInput.placeholder = "Full Name";
+          passInput.placeholder = "Password";
+          mainBtn.innerText = "Sign In";
+          toggleMsg.innerHTML = "New to the project? <span onclick='toggleForm()'>Create Account</span>";
+          isLogin = true;
+        } else {
+          title.innerText = "Join the Green Movement";
+          subtitle.innerText = "ALC CSE Department";
+          nameInput.placeholder = "Full Name";
+          passInput.placeholder = "Create Password";
+          mainBtn.innerText = "Register Account";
+          toggleMsg.innerHTML = "Already a member? <span onclick='toggleForm()'>Sign In</span>";
+          isLogin = false;
+        }
+        document.getElementById("formArea").style.opacity = "1";
+      }, 200);
+    }
 
-let isLogin=false;
+    function handleAuth() {
+      const name = document.getElementById("name").value.trim();
+      const pass = document.getElementById("password").value.trim();
 
-function toggleForm(){
-let form=document.getElementById("formArea");
-if(!isLogin){
-form.innerHTML=`
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Sign In</button>
-`;
-document.querySelector(".toggle").innerText="New user? Register";
-isLogin=true;
-}else{
-form.innerHTML=`
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="register()">Register</button>
-`;
-document.querySelector(".toggle").innerText="Already registered? Sign In";
-isLogin=false;
-}
-}
+      if (!name || !pass) {
+        alert("Please provide both credentials.");
+        return;
+      }
 
-function register(){
-let name=document.getElementById("name").value;
-let pass=document.getElementById("password").value;
-
-if(name===""||pass===""){
-alert("Please fill all fields");
-return;
-}
-
-localStorage.setItem("user_"+name,pass);
-localStorage.setItem("currentUser",name);
-
-alert("Registration Successful!");
-window.location.href="dashboard.html";
-}
-
-function login(){
-let name=document.getElementById("name").value;
-let pass=document.getElementById("password").value;
-
-let savedPass=localStorage.getItem("user_"+name);
-
-if(savedPass===pass){
-localStorage.setItem("currentUser",name);
-alert("Login Successful!");
-window.location.href="dashboard.html";
-}else{
-alert("Invalid Credentials");
-}
-}
-
-</script>
-
+      if (!isLogin) {
+        // Registration Logic
+        localStorage.setItem("user_" + name, pass);
+        localStorage.setItem("currentUser", name);
+        alert("Welcome to the initiative, " + name + "!");
+        window.location.href = "dashboard.html";
+      } else {
+        // Login Logic
+        const savedPass = localStorage.getItem("user_" + name);
+        if (savedPass === pass) {
+          localStorage.setItem("currentUser", name);
+          window.location.href = "dashboard.html";
+        } else {
+          alert("Incorrect username or password. Please try again.");
+        }
+      }
+    }
+  </script>
 </body>
 </html>
