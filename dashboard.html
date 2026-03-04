@@ -1,61 +1,97 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>Smart Tree Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body{
-  font-family: Arial;
-  text-align:center;
-  background:#0f2027;
-  color:white;
-}
-.card{
-  background:#203a43;
-  padding:20px;
-  margin:20px;
-  border-radius:10px;
-}
-button{
-  padding:10px 20px;
-  margin:10px;
-  background:green;
-  color:white;
-  border:none;
-  border-radius:5px;
-}
-input{
-  padding:10px;
-  width:80%;
-}
-</style>
+  <title>Smart Tree Plantation - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Styles -->
+  <style>
+    body {
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 28px;
+      animation: fadeIn 2s;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,255,0,0.4);
+      animation: slideIn 1.5s;
+    }
+    input {
+      padding: 10px;
+      width: 80%;
+      border-radius: 8px;
+      border: none;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00c853;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #00e676;
+      transform: scale(1.05);
+    }
+    .stats {
+      font-size: 18px;
+      margin-top: 10px;
+      animation: fadeIn 2s;
+    }
+    @keyframes fadeIn {
+      from {opacity:0;}
+      to {opacity:1;}
+    }
+    @keyframes slideIn {
+      from {transform: translateY(50px); opacity:0;}
+      to {transform: translateY(0); opacity:1;}
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>🌳 Smart Tree Plantation</h2>
+<h1>🌳 Andhra Loyola - Smart Tree Plantation</h1>
 
 <div class="card">
+  <h3>Plant a Tree</h3>
   <input type="text" id="treeName" placeholder="Enter Tree Name"><br>
-
   <button onclick="getLocation()">Get Live Location</button>
   <p id="locationText">Location not captured</p>
-
-  <button onclick="plantTree()">Plant Tree</button>
+  <button onclick="plantTree()">Plant Tree</button><br>
+  <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
+  <button onclick="window.location.href='certificate.html'">Download Certificate</button>
 </div>
 
-<div class="card">
-  <p>Total Trees: <span id="totalTrees">0</span></p>
+<div class="card stats">
+  <p>Total Trees Planted: <span id="totalTrees">0</span></p>
   <p>Total Green Points: <span id="totalPoints">0</span></p>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-
 const firebaseConfig = {
   apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
   authDomain: "smart-tree-plantation-alc.firebaseapp.com",
@@ -65,34 +101,33 @@ const firebaseConfig = {
   appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Variables to store live location
 let currentLat = null;
 let currentLon = null;
 
+// Get live location
 function getLocation(){
   navigator.geolocation.getCurrentPosition(function(position){
     currentLat = position.coords.latitude;
     currentLon = position.coords.longitude;
-
     document.getElementById("locationText").innerHTML =
       "Latitude: " + currentLat + "<br>Longitude: " + currentLon;
-
   }, function(){
     alert("Location permission denied");
   });
 }
 
+// Plant tree
 function plantTree(){
-
   const treeName = document.getElementById("treeName").value;
-
   if(treeName === ""){
     alert("Enter tree name");
     return;
   }
-
   if(currentLat === null){
     alert("Click Get Live Location first");
     return;
@@ -113,21 +148,20 @@ function plantTree(){
   .catch(error=>{
     alert("Error: "+error.message);
   });
-
 }
 
+// Load total trees & points
 function loadStats(){
   db.collection("plants").get().then(snapshot=>{
     let totalTrees = snapshot.size;
     let totalPoints = totalTrees * 10;
-
     document.getElementById("totalTrees").innerText = totalTrees;
     document.getElementById("totalPoints").innerText = totalPoints;
   });
 }
 
+// Load stats on page load
 loadStats();
-
 </script>
 
 </body>
