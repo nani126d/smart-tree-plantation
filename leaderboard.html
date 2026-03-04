@@ -1,166 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaderboard - Smart Tree Plantation</title>
+<title>Leaderboard | Smart Tree Plantation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#134e5e,#71b280);
-    color:white;
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
 }
 
-header{
-    text-align:center;
-    padding:20px;
-    font-size:24px;
-    font-weight:bold;
+body{
+min-height:100vh;
+background:linear-gradient(-45deg,#134e5e,#71b280,#0f2027,#2c5364);
+background-size:400% 400%;
+animation:gradientBG 15s ease infinite;
+color:white;
+text-align:center;
+}
+
+@keyframes gradientBG{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
 }
 
 .container{
-    width:90%;
-    max-width:800px;
-    margin:30px auto;
+padding:30px 15px;
 }
 
-.table{
-    width:100%;
-    border-collapse:collapse;
-    background:rgba(255,255,255,0.1);
-    border-radius:10px;
-    overflow:hidden;
+h1{
+margin-bottom:10px;
 }
 
-.table th,
-.table td{
-    padding:12px;
-    text-align:center;
+.subtitle{
+opacity:0.8;
+margin-bottom:25px;
 }
 
-.table th{
-    background:rgba(0,0,0,0.3);
+/* Glass Table */
+.table-container{
+max-width:600px;
+margin:0 auto;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(15px);
+border-radius:20px;
+padding:20px;
+box-shadow:0 15px 35px rgba(0,0,0,0.4);
+animation:fadeUp 1s ease;
 }
 
-.table tr:nth-child(even){
-    background:rgba(255,255,255,0.05);
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(30px);}
+to{opacity:1;transform:translateY(0);}
 }
 
-.rank1{
-    background:gold !important;
-    color:black;
-    font-weight:bold;
+table{
+width:100%;
+border-collapse:collapse;
 }
 
-.rank2{
-    background:silver !important;
-    color:black;
-    font-weight:bold;
+th,td{
+padding:12px;
 }
 
-.rank3{
-    background:#cd7f32 !important;
-    color:black;
-    font-weight:bold;
+th{
+border-bottom:2px solid rgba(255,255,255,0.3);
 }
 
-.back-btn{
-    display:block;
-    text-align:center;
-    margin-top:20px;
+tr{
+transition:0.3s;
 }
+
+tr:hover{
+background:rgba(255,255,255,0.1);
+}
+
+.rank{
+font-weight:700;
+font-size:18px;
+}
+
+.gold{color:#ffd700;}
+.silver{color:#c0c0c0;}
+.bronze{color:#cd7f32;}
 
 button{
-    padding:10px 20px;
-    border:none;
-    border-radius:20px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
+margin-top:25px;
+padding:10px 20px;
+border:none;
+border-radius:25px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
 }
 
 button:hover{
-    background:#16a34a;
+background:#16a34a;
+transform:scale(1.05);
 }
 </style>
 </head>
 
 <body>
 
-<header>
-🏆 Global Leaderboard 🌍
-</header>
-
 <div class="container">
 
-<table class="table">
+<h1>🏆 Leaderboard</h1>
+<div class="subtitle">Andhra Loyola College – CSE Department</div>
+
+<div class="table-container">
+<table>
 <thead>
 <tr>
 <th>Rank</th>
-<th>User</th>
-<th>Total Trees 🌳</th>
-<th>Green Points 💚</th>
+<th>Name</th>
+<th>Trees</th>
+<th>Points</th>
 </tr>
 </thead>
-
 <tbody id="leaderboardBody">
 </tbody>
 </table>
-
-<div class="back-btn">
-<button onclick="window.location='dashboard.html'">
-Back to Dashboard
-</button>
 </div>
+
+<button onclick="goDashboard()">⬅ Back to Dashboard</button>
 
 </div>
 
 <script>
 
-// Get all users data
-let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
+let plants = JSON.parse(localStorage.getItem("plants")) || [];
 
-// Convert object to array
-let usersArray = [];
+let userStats = {};
 
-for(let user in usersData){
-    usersArray.push({
-        name:user,
-        trees:usersData[user].trees,
-        points:usersData[user].points
-    });
+// Calculate trees per user
+plants.forEach(p=>{
+if(!userStats[p.user]){
+userStats[p.user]=0;
+}
+userStats[p.user]+=1;
+});
+
+// Convert to array
+let leaderboard = [];
+
+for(let user in userStats){
+leaderboard.push({
+name:user,
+trees:userStats[user],
+points:userStats[user]*10
+});
 }
 
-// Sort by highest points
-usersArray.sort((a,b) => b.points - a.points);
+// Sort by points descending
+leaderboard.sort((a,b)=>b.points-a.points);
 
-let tableBody = document.getElementById("leaderboardBody");
+let tbody=document.getElementById("leaderboardBody");
 
-if(usersArray.length === 0){
-    tableBody.innerHTML =
-    `<tr><td colspan="4">No participants yet 🌱</td></tr>`;
-}
-else{
+leaderboard.forEach((user,index)=>{
 
-    usersArray.forEach((user,index)=>{
+let rankClass="";
+if(index===0) rankClass="gold";
+else if(index===1) rankClass="silver";
+else if(index===2) rankClass="bronze";
 
-        let rowClass = "";
+tbody.innerHTML+=`
+<tr>
+<td class="rank ${rankClass}">${index+1}</td>
+<td>${user.name}</td>
+<td>${user.trees}</td>
+<td>${user.points}</td>
+</tr>
+`;
 
-        if(index===0) rowClass="rank1";
-        else if(index===1) rowClass="rank2";
-        else if(index===2) rowClass="rank3";
+});
 
-        tableBody.innerHTML += `
-        <tr class="${rowClass}">
-            <td>${index+1}</td>
-            <td>${user.name}</td>
-            <td>${user.trees}</td>
-            <td>${user.points}</td>
-        </tr>
-        `;
-    });
+function goDashboard(){
+window.location.href="dashboard.html";
 }
 
 </script>
