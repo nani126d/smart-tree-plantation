@@ -1,164 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel | Smart Tree Plantation</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
-
-<!-- Leaflet Map CDN -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
-body{
-background:linear-gradient(135deg,#0f2027,#2c5364);
-color:white;
-text-align:center;
-min-height:100vh;
-padding:20px;
-}
-
-h1{
-margin-bottom:10px;
-}
-
-.subtitle{
-opacity:0.8;
-margin-bottom:20px;
-}
-
-.login-box{
-max-width:350px;
-margin:40px auto;
-background:rgba(255,255,255,0.1);
-padding:25px;
-border-radius:15px;
-backdrop-filter:blur(10px);
-}
-
-input{
-width:100%;
-padding:10px;
-margin:10px 0;
-border:none;
-border-radius:8px;
-}
-
-button{
-padding:10px 20px;
-border:none;
-border-radius:20px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-font-weight:600;
-margin-top:10px;
-}
-
-button:hover{
-background:#16a34a;
-}
-
-#adminContent{
-display:none;
-margin-top:20px;
-}
-
-#map{
-height:400px;
-border-radius:15px;
-margin-top:20px;
-}
-
-.stats{
-margin-top:20px;
-font-size:18px;
-}
-</style>
+  <title>Smart Tree Plantation - Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin:0; font-family: Arial; background: #0f2027; color: white; text-align:center; }
+    h1 { margin:20px 0; }
+    #map { height: 500px; width: 90%; margin: auto; border-radius: 10px; }
+    .stats { margin:20px; font-size:18px; }
+    button { padding:10px 20px; background: #00c853; color:white; border:none; border-radius:5px; cursor:pointer; margin-bottom:10px; }
+    button:hover { background:#00e676; }
+  </style>
 </head>
-
 <body>
 
-<h1>🌳 Admin Panel</h1>
-<div class="subtitle">Andhra Loyola College – Smart Tree Plantation</div>
-
-<!-- Admin Login -->
-<div class="login-box" id="loginBox">
-<input type="password" id="adminPass" placeholder="Enter Admin Password">
-<button onclick="adminLogin()">Login</button>
-</div>
-
-<!-- Admin Content -->
-<div id="adminContent">
+<h1>🌳 Smart Tree Plantation - Admin</h1>
 
 <div class="stats">
-Total Trees Planted: <strong id="totalTrees"></strong>
+  <p>Total Trees: <span id="totalTrees">0</span></p>
+  <p>Total Green Points: <span id="totalPoints">0</span></p>
 </div>
 
 <div id="map"></div>
 
-<button onclick="logout()">Logout</button>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-</div>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+// 🔥 Your Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
+  authDomain: "smart-tree-plantation-alc.firebaseapp.com",
+  projectId: "smart-tree-plantation-alc",
+  storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
+  messagingSenderId: "1079228357775",
+  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+};
 
-const ADMIN_PASSWORD = "admin123"; // change if needed
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function adminLogin(){
-let pass=document.getElementById("adminPass").value;
-
-if(pass===ADMIN_PASSWORD){
-document.getElementById("loginBox").style.display="none";
-document.getElementById("adminContent").style.display="block";
-loadMap();
-}else{
-alert("Wrong Password");
-}
-}
-
-function logout(){
-location.reload();
-}
-
-function loadMap(){
-
-let plants = JSON.parse(localStorage.getItem("plants")) || [];
-
-document.getElementById("totalTrees").innerText = plants.length;
-
-if(plants.length === 0){
-alert("No trees planted yet");
-return;
-}
-
-// Center map on first plant
-let map = L.map('map').setView([plants[0].lat, plants[0].lon], 15);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-attribution: '&copy; OpenStreetMap contributors'
+// 🌳 Initialize Map
+const map = L.map('map').setView([20.5937, 78.9629], 5); // Center India
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Add markers
-plants.forEach(p=>{
-L.marker([p.lat, p.lon]).addTo(map)
-.bindPopup(
-"<b>User:</b> " + p.user +
-"<br><b>Tree:</b> " + p.tree +
-"<br><b>Date:</b> " + p.date
-);
-});
+// Load Trees from Firebase
+function loadTrees(){
+  db.collection("plants").get().then(snapshot=>{
+    let totalTrees = snapshot.size;
+    let totalPoints = totalTrees * 10;
 
+    document.getElementById("totalTrees").innerText = totalTrees;
+    document.getElementById("totalPoints").innerText = totalPoints;
+
+    snapshot.forEach(doc=>{
+      const data = doc.data();
+      const lat = data.latitude;
+      const lon = data.longitude;
+      const tree = data.tree;
+
+      if(lat && lon){
+        const marker = L.marker([lat, lon]).addTo(map);
+        marker.bindPopup(`<b>Tree:</b> ${tree}<br><b>Points:</b> ${data.points}<br><b>Date:</b> ${data.date}`);
+      }
+    });
+  });
 }
+
+loadTrees();
 
 </script>
 
