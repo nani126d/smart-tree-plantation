@@ -1,198 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Tree Dashboard</title>
+    <title>Smart Tree Plantation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6ffe6;
+            margin: 0;
+            padding: 0;
+        }
 
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-color:white;
-}
-.container{
-width:90%;
-max-width:800px;
-margin:30px auto;
-}
-.card{
-background:rgba(255,255,255,0.1);
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
-}
-input{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-border:none;
-border-radius:6px;
-}
-button{
-padding:10px 20px;
-border:none;
-border-radius:20px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-}
-button:active{
-transform:scale(0.95);
-}
-</style>
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+
+        h2 {
+            text-align: center;
+            color: green;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            background-color: green;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+        }
+
+        #dashboard {
+            display: none;
+        }
+
+        .points {
+            font-size: 18px;
+            font-weight: bold;
+            color: darkgreen;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="container" id="registration">
+    <h2>User Registration</h2>
 
-<div class="card">
-<h2>Plant a Tree 🌱</h2>
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <input type="password" id="password" placeholder="Enter your password" required>
 
-<input type="text" id="treeName" placeholder="Enter Tree Name">
-
-<input type="file" id="treeImage" accept="image/*">
-
-<button id="captureBtn">Capture Location 📍</button>
-<p id="locText"></p>
-
-<button id="plantBtn">Plant Tree 🌳</button>
-
+    <button onclick="registerUser()">Register</button>
 </div>
 
-<div class="card">
-<h3>Total Trees: <span id="totalTrees">0</span></h3>
-<h3>Green Points: <span id="totalPoints">0</span></h3>
+
+<div class="container" id="dashboard">
+    <h2>Plantation Dashboard</h2>
+
+    <p class="points">Total Points: <span id="points">0</span></p>
+
+    <h3>Add Plantation</h3>
+
+    <input type="text" id="treeName" placeholder="Tree Name" required>
+    <input type="file" id="treeImage" accept="image/*" required>
+    <textarea id="experience" placeholder="Share your plantation experience" rows="4"></textarea>
+
+    <button onclick="addPlantation()">Submit Plantation</button>
+
+    <h3>My Plantations</h3>
+    <div id="plantationList"></div>
 </div>
 
-<div class="card">
-<h3>History</h3>
-<div id="history"></div>
-</div>
-
-</div>
 
 <script>
-let latitude = null;
-let longitude = null;
+    let totalPoints = 0;
 
-let currentUser = localStorage.getItem("currentUser");
-if(!currentUser){
-alert("Login first");
-window.location="index.html";
-}
+    function registerUser() {
+        let name = document.getElementById("name").value;
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
 
-let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
+        if(name === "" || email === "" || password === "") {
+            alert("Please fill all details!");
+            return;
+        }
 
-if(!usersData[currentUser]){
-usersData[currentUser] = { trees:0, points:0, history:[] };
-}
+        alert("Registration Successful!");
 
-document.getElementById("captureBtn").onclick = function(){
-navigator.geolocation.getCurrentPosition(function(position){
-latitude = position.coords.latitude;
-longitude = position.coords.longitude;
-document.getElementById("locText").innerText = "Location Captured ✅";
-});
-};
+        document.getElementById("registration").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+    }
 
-document.getElementById("plantBtn").onclick = function(){
+    function addPlantation() {
+        let treeName = document.getElementById("treeName").value;
+        let experience = document.getElementById("experience").value;
 
-let name = document.getElementById("treeName").value.trim();
-let file = document.getElementById("treeImage").files[0];
+        if(treeName === "" || experience === "") {
+            alert("Please fill all plantation details!");
+            return;
+        }
 
-if(!name){ alert("Enter tree name"); return; }
-if(!file){ alert("Upload image"); return; }
-if(latitude === null){ alert("Capture location first"); return; }
+        totalPoints += 10;
+        document.getElementById("points").innerText = totalPoints;
 
-// 🔥 COMPRESS IMAGE
-let reader = new FileReader();
+        let plantationDiv = document.createElement("div");
+        plantationDiv.innerHTML = `
+            <hr>
+            <h4>Tree: ${treeName}</h4>
+            <p><b>Experience:</b> ${experience}</p>
+            <p><b>Points Earned:</b> 10</p>
+        `;
 
-reader.onload = function(e){
+        document.getElementById("plantationList").appendChild(plantationDiv);
 
-let img = new Image();
-img.src = e.target.result;
+        document.getElementById("treeName").value = "";
+        document.getElementById("experience").value = "";
 
-img.onload = function(){
-
-let canvas = document.createElement("canvas");
-let ctx = canvas.getContext("2d");
-
-let maxWidth = 400;   // reduce size
-let scale = maxWidth / img.width;
-
-canvas.width = maxWidth;
-canvas.height = img.height * scale;
-
-ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-let compressedImage = canvas.toDataURL("image/jpeg", 0.6); // 60% quality
-
-try{
-
-usersData[currentUser].trees += 1;
-usersData[currentUser].points += 10;
-
-usersData[currentUser].history.push({
-name:name,
-image:compressedImage,
-lat:latitude,
-lon:longitude,
-points:10,
-date:new Date().toLocaleString()
-});
-
-localStorage.setItem("usersData", JSON.stringify(usersData));
-
-alert("Tree Planted Successfully 🌳");
-
-updateUI();
-
-document.getElementById("treeName").value="";
-document.getElementById("treeImage").value="";
-document.getElementById("locText").innerText="";
-latitude=null;
-longitude=null;
-
-}catch(error){
-alert("Storage limit reached! Clear some data.");
-console.log(error);
-}
-
-};
-
-};
-
-reader.readAsDataURL(file);
-
-};
-
-function updateUI(){
-document.getElementById("totalTrees").innerText =
-usersData[currentUser].trees;
-
-document.getElementById("totalPoints").innerText =
-usersData[currentUser].points;
-
-let historyDiv = document.getElementById("history");
-historyDiv.innerHTML="";
-
-usersData[currentUser].history.forEach(tree=>{
-historyDiv.innerHTML += `
-<p>
-🌳 ${tree.name} - ${tree.points} Points<br>
-<a target="_blank"
-href="https://www.google.com/maps?q=${tree.lat},${tree.lon}">
-View Location</a>
-</p>
-`;
-});
-}
-
-updateUI();
-
+        alert("Plantation Added! You earned 10 points 🌱");
+    }
 </script>
 
 </body>
