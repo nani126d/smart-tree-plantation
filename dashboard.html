@@ -1,115 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Andhra Loyola - Smart Tree Plantation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Styles -->
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      text-align: center;
-      overflow-x: hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALC | Smart Tree Plantation Portal</title>
 
-    h1 {
-      margin-top: 30px;
-      font-size: 36px;
-      animation: fadeIn 2s;
-      letter-spacing: 1px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      padding: 25px;
-      margin: 25px auto;
-      width: 90%;
-      max-width: 450px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0,255,0,0.5);
-      animation: slideIn 1.5s;
-      transition: transform 0.3s;
-    }
+<style>
+:root {
+  --primary-green: #2ecc71;
+  --accent-gold: #f1c40f;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
 
-    .card:hover { transform: scale(1.02); }
+* { box-sizing: border-box; }
 
-    input {
-      padding: 12px;
-      width: 80%;
-      border-radius: 10px;
-      border: none;
-      margin: 12px 0;
-      font-size: 16px;
-    }
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+              url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=2560');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    button {
-      padding: 12px 22px;
-      margin: 8px;
-      border: none;
-      border-radius: 12px;
-      background: #00c853;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+header {
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeInDown 1s ease-out;
+}
 
-    button:hover {
-      background: #00e676;
-      transform: scale(1.05);
-    }
+header h1 {
+  font-weight: 700;
+  font-size: 2.5rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+}
 
-    .stats {
-      font-size: 20px;
-      margin-top: 20px;
-      animation: fadeIn 2s;
-    }
+header p {
+  font-weight: 300;
+  color: var(--primary-green);
+  letter-spacing: 2px;
+}
 
-    #locationText {
-      margin: 8px 0;
-      font-style: italic;
-      font-size: 14px;
-    }
+.container {
+  width: 95%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  padding-bottom: 50px;
+}
 
-    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-    @keyframes slideIn { from {transform: translateY(60px); opacity:0;} to {transform: translateY(0); opacity:1;} }
-  </style>
+/* Glassmorphism Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.4s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--primary-green);
+  transform: translateY(-5px);
+}
+
+h3 {
+  margin-top: 0;
+  font-weight: 600;
+  border-left: 4px solid var(--primary-green);
+  padding-left: 15px;
+  margin-bottom: 25px;
+}
+
+/* Input Styling */
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: #ccc;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-green);
+}
+
+/* Buttons */
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+
+button {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-primary { background: var(--primary-green); color: #fff; width: 100%; margin-top: 15px; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); }
+.btn-accent { background: var(--accent-gold); color: #000; }
+
+button:hover { filter: brightness(1.2); transform: scale(1.02); }
+
+/* Stats Section */
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 20px;
+  border-radius: 15px;
+  background: rgba(0,0,0,0.2);
+  margin-bottom: 15px;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  display: block;
+}
+
+.stat-label { font-size: 0.9rem; text-transform: uppercase; color: #aaa; }
+
+#locationText {
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+  margin-top: 10px;
+  min-height: 30px;
+}
+
+/* Toast Animation */
+#toast {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: var(--primary-green);
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+  font-size: 16px;
+  transform: translateX(-50%);
+}
+
+#toast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein { from {bottom: 0; opacity:0;} to {bottom:30px; opacity:1;} }
+@keyframes fadeout { from {bottom:30px; opacity:1;} to {bottom:0; opacity:0;} }
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .container { grid-template-columns: 1fr; }
+  header h1 { font-size: 1.8rem; }
+}
+</style>
 </head>
-
 <body>
 
-<h1>🌳 Andhra Loyola - Smart Tree Plantation</h1>
+<header>
+  <h1>Andhra Loyola College</h1>
+  <p><i class="fas fa-leaf"></i> SMART TREE PLANTATION PROJECT</p>
+</header>
 
-<div class="card">
-  <h3>Plant a Tree</h3>
-  <input type="text" id="userName" placeholder="Enter Your Name"><br>
-  <input type="text" id="treeName" placeholder="Enter Tree Name"><br>
+<div class="container">
+  <div class="glass-card">
+    <h3><i class="fas fa-seedling"></i> Register Your Impact</h3>
+    
+    <div class="input-group">
+      <label>VOLUNTEER NAME</label>
+      <input type="text" id="userName" placeholder="e.g. John Doe">
+    </div>
 
-  <button onclick="getLocation()">Get Live Location</button>
-  <p id="locationText">Location not captured</p>
+    <div class="input-group">
+      <label>TREE SPECIES</label>
+      <input type="text" id="treeName" placeholder="e.g. Neem, Peepal, Banyan">
+    </div>
 
-  <button onclick="plantTree()">Plant Tree</button><br>
+    <button class="btn-secondary" style="width:100%;" onclick="getLocation()">
+      <i class="fas fa-map-marker-alt"></i> Get Geo-Location
+    </button>
+    <p id="locationText"><i class="fas fa-satellite"></i> GPS coordinates required...</p>
 
-  <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
-  <button onclick="window.location.href='certificate.html'">Download Certificate</button>
+    <button class="btn-primary" id="plantBtn" onclick="plantTree()" disabled>
+      <i class="fas fa-hand-holding-heart"></i> SUBMIT PLANTATION
+    </button>
+  </div>
+
+  <div class="stats-container">
+    <div class="glass-card">
+      <h3><i class="fas fa-chart-line"></i> Real-time Analytics</h3>
+      <div class="stat-box">
+        <span class="stat-number" id="totalTrees">0</span>
+        <span class="stat-label">Trees Planted</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number" id="totalPoints">0</span>
+        <span class="stat-label">Green Credits Earned</span>
+      </div>
+
+      <div class="btn-grid">
+        <button class="btn-secondary" onclick="window.location.href='leaderboard.html'">
+          <i class="fas fa-trophy"></i> Ranking
+        </button>
+        <button class="btn-accent" onclick="window.location.href='certificate.html'">
+          <i class="fas fa-certificate"></i> Certificate
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card stats">
-  <p>Total Trees Planted: <span id="totalTrees">0</span></p>
-  <p>Total Green Points: <span id="totalPoints">0</span></p>
-</div>
+<!-- Toast -->
+<div id="toast">Tree Planted Successfully! 🌳</div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-// 🔥 Firebase Config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
   authDomain: "smart-tree-plantation-alc.firebaseapp.com",
@@ -118,43 +279,44 @@ const firebaseConfig = {
   messagingSenderId: "1079228357775",
   appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Live location
 let currentLat = null;
 let currentLon = null;
+const plantBtn = document.getElementById("plantBtn");
 
-// Get Live Location
 function getLocation(){
+  const locDisplay = document.getElementById("locationText");
+  locDisplay.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Accessing GPS...';
+
   if(!navigator.geolocation){
     alert("Geolocation is not supported by your browser");
     return;
   }
 
   navigator.geolocation.getCurrentPosition(function(position){
-    currentLat = position.coords.latitude;
-    currentLon = position.coords.longitude;
-    document.getElementById("locationText").innerHTML =
-      "Latitude: " + currentLat + "<br>Longitude: " + currentLon;
+    currentLat = position.coords.latitude.toFixed(6);
+    currentLon = position.coords.longitude.toFixed(6);
+    locDisplay.innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71"></i> Lat: ${currentLat} | Lon: ${currentLon}`;
+    plantBtn.disabled = false;
   }, function(){
     alert("Location permission denied");
+    locDisplay.innerHTML = "Location access denied.";
   });
 }
 
-// Plant Tree
 function plantTree(){
-  const userName = document.getElementById("userName").value;
-  const treeName = document.getElementById("treeName").value;
+  const userName = document.getElementById("userName").value.trim();
+  const treeName = document.getElementById("treeName").value.trim();
 
-  if(userName === "" || treeName === ""){
-    alert("Enter your name and tree name");
+  if(!userName || !treeName){
+    alert("Please provide both your name and the tree type.");
     return;
   }
 
-  if(currentLat === null){
-    alert("Click Get Live Location first");
+  if(!currentLat){
+    alert("Please enable GPS location before planting.");
     return;
   }
 
@@ -164,21 +326,19 @@ function plantTree(){
     latitude: currentLat,
     longitude: currentLon,
     points: 10,
-    date: new Date().toLocaleString()
-  })
-  .then(()=>{
-    alert("Tree Planted Successfully 🌳");
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    showToast();
     document.getElementById("treeName").value="";
     loadStats();
-  })
-  .catch(error=>{
-    alert("Error: "+error.message);
+  }).catch(error=>{
+    console.error("Error: ", error);
   });
 }
 
-// Load stats
+// Realtime stats
 function loadStats(){
-  db.collection("plants").get().then(snapshot=>{
+  db.collection("plants").onSnapshot(snapshot => {
     const totalTrees = snapshot.size;
     const totalPoints = totalTrees * 10;
     document.getElementById("totalTrees").innerText = totalTrees;
@@ -186,7 +346,12 @@ function loadStats(){
   });
 }
 
-// Load stats on page load
+function showToast(){
+  const toast = document.getElementById("toast");
+  toast.className = "show";
+  setTimeout(()=>{ toast.className = toast.className.replace("show",""); }, 3000);
+}
+
 loadStats();
 </script>
 
