@@ -1,227 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Tree Plantation | Andhra Loyola College</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Smart Tree Plantation - Dashboard</title>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
 body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(-45deg,#134e5e,#71b280,#0f2027,#2c5364);
-background-size:400% 400%;
-animation:gradientBG 12s ease infinite;
-overflow:hidden;
-color:white;
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    color:white;
 }
 
-@keyframes gradientBG{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 30px;
+    background:rgba(0,0,0,0.3);
 }
 
-/* Floating circles */
-.circle{
-position:absolute;
-border-radius:50%;
-background:rgba(255,255,255,0.1);
-animation:float 10s infinite ease-in-out;
+header img{
+    height:45px;
 }
 
-.circle:nth-child(1){
-width:200px;
-height:200px;
-top:10%;
-left:10%;
-}
-
-.circle:nth-child(2){
-width:150px;
-height:150px;
-bottom:15%;
-right:10%;
-animation-duration:14s;
-}
-
-.circle:nth-child(3){
-width:100px;
-height:100px;
-top:60%;
-left:70%;
-animation-duration:18s;
-}
-
-@keyframes float{
-0%{transform:translateY(0px);}
-50%{transform:translateY(-40px);}
-100%{transform:translateY(0px);}
-}
-
-/* Main Card */
 .container{
-position:relative;
-background:rgba(255,255,255,0.1);
-padding:40px;
-border-radius:20px;
-backdrop-filter:blur(15px);
-box-shadow:0 15px 35px rgba(0,0,0,0.4);
-text-align:center;
-width:350px;
-animation:fadeIn 1.5s ease;
+    width:90%;
+    max-width:900px;
+    margin:40px auto;
 }
 
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(30px);}
-to{opacity:1; transform:translateY(0);}
-}
-
-h1{
-font-size:22px;
-margin-bottom:5px;
-}
-
-h2{
-font-size:18px;
-margin-bottom:20px;
-font-weight:300;
+.card{
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:25px;
 }
 
 input{
-width:100%;
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:10px;
-outline:none;
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border:none;
+    border-radius:6px;
 }
 
 button{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:25px;
-background:#22c55e;
-color:white;
-font-weight:600;
-cursor:pointer;
-transition:0.3s;
+    padding:10px 20px;
+    border:none;
+    border-radius:20px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
 }
 
 button:hover{
-background:#16a34a;
-transform:scale(1.05);
+    background:#16a34a;
 }
 
-.toggle{
-margin-top:15px;
-font-size:14px;
-cursor:pointer;
-color:#bbf7d0;
+.stats{
+    display:flex;
+    justify-content:space-around;
+    margin-top:15px;
 }
 
-.footer{
-position:absolute;
-bottom:15px;
-font-size:12px;
-opacity:0.8;
+.history-item{
+    background:rgba(255,255,255,0.15);
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="circle"></div>
-<div class="circle"></div>
-<div class="circle"></div>
+<header>
+<div style="display:flex;align-items:center;gap:10px;">
+<img src="Logo.png">
+<h3>Smart Tree Plantation</h3>
+</div>
+<div>
+Welcome, <span id="username"></span>
+</div>
+</header>
 
 <div class="container">
 
-<h1>🌳 Smart Tree Plantation</h1>
-<h2>Andhra Loyola College – CSE Department</h2>
-
-<div id="formArea">
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="register()">Register</button>
+<div class="card">
+<h2>Plant New Tree 🌱</h2>
+<input type="text" id="treeName" placeholder="Tree Name">
+<input type="text" id="treeLocation" placeholder="Location">
+<button id="plantBtn">Plant Tree</button>
 </div>
 
-<div class="toggle" onclick="toggleForm()">Already registered? Sign In</div>
-
+<div class="card">
+<h2>Your Impact 📊</h2>
+<div class="stats">
+<div>Total Trees 🌳<br><strong id="treeCount">0</strong></div>
+<div>Green Points 💚<br><strong id="greenPoints">0</strong></div>
+</div>
 </div>
 
-<div class="footer">
-© 2026 Andhra Loyola College | Green Technology Initiative
+<div class="card">
+<h2>Plantation History 🌿</h2>
+<div id="history"></div>
+</div>
+
 </div>
 
 <script>
 
-let isLogin=false;
+let currentUser = localStorage.getItem("currentUser");
 
-function toggleForm(){
-let form=document.getElementById("formArea");
-if(!isLogin){
-form.innerHTML=`
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Sign In</button>
-`;
-document.querySelector(".toggle").innerText="New user? Register";
-isLogin=true;
-}else{
-form.innerHTML=`
-<input type="text" id="name" placeholder="Full Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="register()">Register</button>
-`;
-document.querySelector(".toggle").innerText="Already registered? Sign In";
-isLogin=false;
-}
+if(!currentUser){
+    alert("Please login first.");
+    window.location="index.html";
 }
 
-function register(){
-let name=document.getElementById("name").value;
-let pass=document.getElementById("password").value;
+document.getElementById("username").innerText = currentUser;
 
-if(name===""||pass===""){
-alert("Please fill all fields");
-return;
+let usersData = JSON.parse(localStorage.getItem("usersData"));
+
+if(!usersData){
+    usersData = {};
 }
 
-localStorage.setItem("user_"+name,pass);
-localStorage.setItem("currentUser",name);
-
-alert("Registration Successful!");
-window.location.href="dashboard.html";
+if(!usersData[currentUser]){
+    usersData[currentUser] = {
+        trees:0,
+        points:0,
+        history:[]
+    };
 }
 
-function login(){
-let name=document.getElementById("name").value;
-let pass=document.getElementById("password").value;
+localStorage.setItem("usersData", JSON.stringify(usersData));
 
-let savedPass=localStorage.getItem("user_"+name);
+function updateUI(){
 
-if(savedPass===pass){
-localStorage.setItem("currentUser",name);
-alert("Login Successful!");
-window.location.href="dashboard.html";
-}else{
-alert("Invalid Credentials");
+    document.getElementById("treeCount").innerText =
+        usersData[currentUser].trees;
+
+    document.getElementById("greenPoints").innerText =
+        usersData[currentUser].points;
+
+    let historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "";
+
+    usersData[currentUser].history.forEach(item => {
+
+        let div = document.createElement("div");
+        div.className="history-item";
+        div.innerHTML =
+            "<strong>"+item.name+"</strong><br>" +
+            "Location: "+item.location+"<br>" +
+            "<small>"+item.date+"</small>";
+
+        historyDiv.appendChild(div);
+    });
 }
+
+function plantTree(){
+
+    let name = document.getElementById("treeName").value.trim();
+    let location = document.getElementById("treeLocation").value.trim();
+
+    if(name==="" || location===""){
+        alert("Please enter tree name and location");
+        return;
+    }
+
+    usersData[currentUser].trees += 1;
+    usersData[currentUser].points += 10;
+
+    usersData[currentUser].history.push({
+        name:name,
+        location:location,
+        date:new Date().toLocaleString()
+    });
+
+    localStorage.setItem("usersData", JSON.stringify(usersData));
+
+    document.getElementById("treeName").value="";
+    document.getElementById("treeLocation").value="";
+
+    updateUI();
 }
+
+document.getElementById("plantBtn")
+.addEventListener("click", plantTree);
+
+updateUI();
 
 </script>
 
