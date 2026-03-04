@@ -3,191 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard | Smart Tree Plantation</title>
+<title>Admin Panel - Smart Tree Plantation</title>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family:'Segoe UI',sans-serif;
-    background:linear-gradient(135deg,#141e30,#243b55);
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
     color:white;
 }
 
 header{
+    text-align:center;
     padding:20px;
-    text-align:center;
-    background:rgba(0,0,0,0.4);
-    backdrop-filter:blur(10px);
-}
-
-.container{
-    width:95%;
-    margin:30px auto;
-}
-
-.card{
-    background:rgba(255,255,255,0.08);
-    padding:25px;
-    border-radius:20px;
-    backdrop-filter:blur(20px);
-    box-shadow:0 10px 30px rgba(0,0,0,0.4);
-    margin-bottom:30px;
-}
-
-input{
-    padding:10px;
-    width:250px;
-    border-radius:8px;
-    border:none;
-    margin:10px;
-}
-
-button{
-    padding:10px 20px;
-    border:none;
-    border-radius:25px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-button:hover{
-    background:#16a34a;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    background:white;
-    color:black;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-th, td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
-    text-align:center;
-}
-
-th{
-    background:#16a34a;
-    color:white;
+    font-size:24px;
+    font-weight:bold;
+    background:rgba(0,0,0,0.3);
 }
 
 .stats{
-    font-size:18px;
-    margin-bottom:15px;
+    text-align:center;
+    padding:15px;
 }
+
+#map{
+    height:500px;
+    margin:20px;
+    border-radius:12px;
+    border:3px solid white;
+}
+
+.point-label{
+    background:#22c55e;
+    color:white;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+    border:none;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>🌳 Admin Dashboard – Smart Tree Plantation</h2>
+🌍 Admin Control Panel - Live Plantation Map
 </header>
 
-<div class="container">
-
-<div class="card" id="loginSection">
-<h3>Admin Login</h3>
-<input type="text" id="adminUser" placeholder="Username">
-<input type="password" id="adminPass" placeholder="Password"><br>
-<button onclick="adminLogin()">Login</button>
-</div>
-
-<div id="adminPanel" style="display:none;">
-
-<div class="card">
 <div class="stats">
-Total Trees: <strong id="totalTrees">0</strong> |
-Total Points: <strong id="totalPoints">0</strong>
-</div>
-<button onclick="resetData()">Reset System</button>
-<button onclick="logout()">Logout</button>
+Total Users: <strong id="totalUsers">0</strong> |
+Total Trees Planted: <strong id="totalTrees">0</strong>
 </div>
 
-<div class="card">
-<h3>🌿 Plantation Records</h3>
-<table id="dataTable">
-<tr>
-<th>User</th>
-<th>Tree Name</th>
-<th>Location</th>
-<th>Date</th>
-</tr>
-</table>
-</div>
-
-</div>
-
-</div>
+<div id="map"></div>
 
 <script>
 
-function adminLogin(){
+// Initialize map (center of India)
+var map = L.map('map').setView([20.5937, 78.9629], 5);
 
-    if(!localStorage.getItem("adminUser")){
-        localStorage.setItem("adminUser","admin");
-        localStorage.setItem("adminPass","1234");
-    }
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
-    let storedUser = localStorage.getItem("adminUser");
-    let storedPass = localStorage.getItem("adminPass");
+let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
 
-    let user = document.getElementById("adminUser").value;
-    let pass = document.getElementById("adminPass").value;
+let totalUsers = 0;
+let totalTrees = 0;
 
-    if(user===storedUser && pass===storedPass){
-        document.getElementById("loginSection").style.display="none";
-        document.getElementById("adminPanel").style.display="block";
-        loadData();
-    }else{
-        alert("Invalid Credentials");
-    }
-}
+for(let user in usersData){
 
-function loadData(){
+    totalUsers++;
 
-    let data = JSON.parse(localStorage.getItem("usersData")) || {};
-    let table = document.getElementById("dataTable");
+    usersData[user].history.forEach(tree => {
 
-    let totalTrees = 0;
-    let totalPoints = 0;
+        totalTrees++;
 
-    Object.keys(data).forEach(user=>{
-        totalTrees += data[user].trees;
-        totalPoints += data[user].points;
+        if(tree.lat && tree.lon){
 
-        if(data[user].history){
-            data[user].history.forEach(record=>{
-                let row = table.insertRow();
-                row.insertCell(0).innerText = user;
-                row.insertCell(1).innerText = record.tree;
-                row.insertCell(2).innerText = record.location;
-                row.insertCell(3).innerText = record.date;
+            // Create custom green points badge
+            let greenIcon = L.divIcon({
+                className: 'custom-icon',
+                html: `<div class="point-label">${tree.points} 💚</div>`
             });
+
+            let marker = L.marker([tree.lat, tree.lon], {
+                icon: greenIcon
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <div style="text-align:center; color:black;">
+                    <strong>${tree.name}</strong><br>
+                    User: ${user}<br>
+                    Green Points: ${tree.points}<br>
+                    Date: ${tree.date}<br><br>
+                    <img src="${tree.image}" 
+                         width="150" 
+                         style="border-radius:8px;">
+                </div>
+            `);
         }
+
     });
-
-    document.getElementById("totalTrees").innerText = totalTrees;
-    document.getElementById("totalPoints").innerText = totalPoints;
 }
 
-function resetData(){
-    if(confirm("Delete all plantation data?")){
-        localStorage.removeItem("usersData");
-        alert("System Reset Complete");
-        location.reload();
-    }
-}
-
-function logout(){
-    location.reload();
-}
+document.getElementById("totalUsers").innerText = totalUsers;
+document.getElementById("totalTrees").innerText = totalTrees;
 
 </script>
 
