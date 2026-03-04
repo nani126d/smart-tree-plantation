@@ -1,82 +1,316 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Tree Plantation - Admin</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALC | Green Registry Admin</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <style>
-    body { margin:0; font-family: Arial; background: #0f2027; color: white; text-align:center; }
-    h1 { margin:20px 0; }
-    #map { height: 500px; width: 90%; margin: auto; border-radius: 10px; }
-    .stats { margin:20px; font-size:18px; }
-    button { padding:10px 20px; background: #00c853; color:white; border:none; border-radius:5px; cursor:pointer; margin-bottom:10px; }
-    button:hover { background:#00e676; }
+    :root {
+      --primary-green: #2ecc71;
+      --sidebar-dark: #09121d;
+      --bg-dark: #111b27;
+      --card-glass: rgba(255, 255, 255, 0.03);
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --accent-gold: #f1c40f;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg-dark);
+      color: #e0e6ed;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Professional Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar-dark);
+      border-right: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      position: fixed;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      font-size: 1.2rem;
+      color: var(--primary-green);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-item {
+      padding: 15px;
+      color: #8a99af;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: 0.3s;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: var(--card-glass);
+      color: var(--primary-green);
+      border-left: 3px solid var(--primary-green);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 260px;
+      flex: 1;
+      padding: 40px;
+      width: calc(100% - 260px);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .welcome-text h1 { font-size: 1.8rem; font-weight: 700; }
+    .welcome-text p { color: #8a99af; font-size: 0.9rem; }
+
+    /* Top Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      padding: 30px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: 0.3s;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--primary-green); }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      background: rgba(46, 204, 113, 0.1);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary-green);
+    }
+
+    .stat-val { font-size: 1.8rem; font-weight: 700; display: block; }
+    .stat-tit { font-size: 0.8rem; color: #8a99af; text-transform: uppercase; }
+
+    /* Map Section */
+    .section-title { margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    #map {
+      height: 450px;
+      border-radius: 24px;
+      border: 1px solid var(--border-glass);
+      z-index: 1;
+      margin-bottom: 40px;
+      filter: grayscale(1) invert(1) hue-rotate(180deg) brightness(0.8); /* Professional Dark Map Effect */
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 20px; color: #8a99af; font-size: 0.8rem; text-transform: uppercase; }
+    td { padding: 20px; border-top: 1px solid var(--border-glass); font-size: 0.9rem; }
+
+    .badge {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--primary-green);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .tree-thumb {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border-glass);
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { width: 80px; padding: 30px 10px; }
+      .sidebar h2, .nav-item span { display: none; }
+      .main-content { margin-left: 80px; width: calc(100% - 80px); }
+    }
   </style>
 </head>
 <body>
 
-<h1>🌳 Smart Tree Plantation - Admin</h1>
+  <nav class="sidebar">
+    <h2><i class="fas fa-leaf"></i> <span>ALC ADMIN</span></h2>
+    <a href="#" class="nav-item active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
+    <a href="#" class="nav-item"><i class="fas fa-map-marked-alt"></i> <span>Geodata</span></a>
+    <a href="#" class="nav-item"><i class="fas fa-users"></i> <span>Volunteers</span></a>
+    <a href="#" class="nav-item"><i class="fas fa-cog"></i> <span>Settings</span></a>
+  </nav>
 
-<div class="stats">
-  <p>Total Trees: <span id="totalTrees">0</span></p>
-  <p>Total Green Points: <span id="totalPoints">0</span></p>
-</div>
+  <main class="main-content">
+    <div class="header-row">
+      <div class="welcome-text">
+        <h1>Green Registry Analytics</h1>
+        <p>Comprehensive monitoring of the ALC reforestation program.</p>
+      </div>
+      <button onclick="location.reload()" style="background: var(--primary-green); color: white; border:none; padding:12px 25px; border-radius:12px; font-weight:600; cursor:pointer;">
+        <i class="fas fa-sync-alt"></i> Refresh Data
+      </button>
+    </div>
 
-<div id="map"></div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-box"><i class="fas fa-tree"></i></div>
+        <div>
+          <span class="stat-val" id="totalTrees">0</span>
+          <span class="stat-tit">Total Plantations</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box"><i class="fas fa-user-friends"></i></div>
+        <div>
+          <span class="stat-val" id="totalUsers">0</span>
+          <span class="stat-tit">Active Volunteers</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box"><i class="fas fa-star"></i></div>
+        <div>
+          <span class="stat-val" id="avgPoints">0</span>
+          <span class="stat-tit">Average Points</span>
+        </div>
+      </div>
+    </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <h3 class="section-title"><i class="fas fa-globe-americas"></i> Geospatial Distribution</h3>
+    <div id="map"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <h3 class="section-title"><i class="fas fa-list-ul"></i> Plantation Registry</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Volunteer</th>
+            <th>Species</th>
+            <th>Location</th>
+            <th>Impact Score</th>
+            <th>Timestamp</th>
+            <th>Verification</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody">
+          <tr><td colspan="6" style="text-align:center; padding: 40px; color: #8a99af;">Initalizing registry stream...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
 
-<script>
-// 🔥 Your Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
-  authDomain: "smart-tree-plantation-alc.firebaseapp.com",
-  projectId: "smart-tree-plantation-alc",
-  storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
-  messagingSenderId: "1079228357775",
-  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
-};
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  <script>
+    // Paste your existing Firebase config here
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
+      authDomain: "smart-tree-plantation-alc.firebaseapp.com",
+      projectId: "smart-tree-plantation-alc",
+      storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
+      messagingSenderId: "1079228357775",
+      appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+    };
 
-// 🌳 Initialize Map
-const map = L.map('map').setView([20.5937, 78.9629], 5); // Center India
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-// Load Trees from Firebase
-function loadTrees(){
-  db.collection("plants").get().then(snapshot=>{
-    let totalTrees = snapshot.size;
-    let totalPoints = totalTrees * 10;
+    // Map Setup
+    const map = L.map('map', { zoomControl: false }).setView([16.5062, 80.6480], 14); // Set to Vijayawada/Andhra Loyola area
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    document.getElementById("totalTrees").innerText = totalTrees;
-    document.getElementById("totalPoints").innerText = totalPoints;
+    function loadAdminData(){
+      db.collection("plants").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+        const tbody = document.getElementById("adminTableBody");
+        tbody.innerHTML = "";
+        
+        let totalPoints = 0;
+        const volunteers = new Set();
 
-    snapshot.forEach(doc=>{
-      const data = doc.data();
-      const lat = data.latitude;
-      const lon = data.longitude;
-      const tree = data.tree;
+        // Clear existing markers
+        map.eachLayer((layer) => { if(layer instanceof L.Marker) map.removeLayer(layer); });
 
-      if(lat && lon){
-        const marker = L.marker([lat, lon]).addTo(map);
-        marker.bindPopup(`<b>Tree:</b> ${tree}<br><b>Points:</b> ${data.points}<br><b>Date:</b> ${data.date}`);
-      }
-    });
-  });
-}
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          volunteers.add(data.user);
+          totalPoints += (data.points || 0);
 
-loadTrees();
+          // Add Row
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><i class="fas fa-user-circle"></i> <b>${data.user}</b></td>
+            <td>${data.tree}</td>
+            <td style="font-family:monospace; font-size:0.8rem;">${data.latitude}, ${data.longitude}</td>
+            <td><span class="badge">${data.points} PTS</span></td>
+            <td style="color:#8a99af">${data.date || 'N/A'}</td>
+            <td>${data.imageURL ? `<img class="tree-thumb" src="${data.imageURL}">` : '<i class="fas fa-check-circle" style="color:var(--primary-green)"></i> Verified'}</td>
+          `;
+          tbody.appendChild(tr);
 
-</script>
+          // Add Marker with Custom Style
+          if(data.latitude && data.longitude){
+            const marker = L.marker([data.latitude, data.longitude]).addTo(map);
+            marker.bindPopup(`<div style="color:#000"><b>${data.user}</b><br>${data.tree}</div>`);
+          }
+        });
 
+        // Update Dashboard Stats
+        document.getElementById("totalTrees").innerText = snapshot.size;
+        document.getElementById("totalUsers").innerText = volunteers.size;
+        document.getElementById("avgPoints").innerText = snapshot.size > 0 ? (totalPoints / snapshot.size).toFixed(1) : 0;
+
+        if(snapshot.empty){
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">No records found in database.</td></tr>';
+        }
+      });
+    }
+
+    loadAdminData();
+  </script>
 </body>
 </html>
