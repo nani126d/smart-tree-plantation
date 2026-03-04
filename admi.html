@@ -1,120 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - Smart Tree Plantation</title>
+<title>Admin Panel | Smart Tree Plantation</title>
 
-<!-- Leaflet Map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+<!-- Leaflet Map CDN -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
-    color:white;
+background:linear-gradient(135deg,#0f2027,#2c5364);
+color:white;
+text-align:center;
+min-height:100vh;
+padding:20px;
 }
 
-header{
-    text-align:center;
-    padding:20px;
-    font-size:24px;
-    font-weight:bold;
-    background:rgba(0,0,0,0.3);
+h1{
+margin-bottom:10px;
 }
 
-.stats{
-    text-align:center;
-    padding:15px;
+.subtitle{
+opacity:0.8;
+margin-bottom:20px;
+}
+
+.login-box{
+max-width:350px;
+margin:40px auto;
+background:rgba(255,255,255,0.1);
+padding:25px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:none;
+border-radius:8px;
+}
+
+button{
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+font-weight:600;
+margin-top:10px;
+}
+
+button:hover{
+background:#16a34a;
+}
+
+#adminContent{
+display:none;
+margin-top:20px;
 }
 
 #map{
-    height:500px;
-    margin:20px;
-    border-radius:12px;
-    border:3px solid white;
+height:400px;
+border-radius:15px;
+margin-top:20px;
 }
 
-.point-label{
-    background:#22c55e;
-    color:white;
-    padding:4px 8px;
-    border-radius:20px;
-    font-size:12px;
-    font-weight:bold;
-    border:none;
+.stats{
+margin-top:20px;
+font-size:18px;
 }
-
 </style>
 </head>
 
 <body>
 
-<header>
-🌍 Admin Control Panel - Live Plantation Map
-</header>
+<h1>🌳 Admin Panel</h1>
+<div class="subtitle">Andhra Loyola College – Smart Tree Plantation</div>
+
+<!-- Admin Login -->
+<div class="login-box" id="loginBox">
+<input type="password" id="adminPass" placeholder="Enter Admin Password">
+<button onclick="adminLogin()">Login</button>
+</div>
+
+<!-- Admin Content -->
+<div id="adminContent">
 
 <div class="stats">
-Total Users: <strong id="totalUsers">0</strong> |
-Total Trees Planted: <strong id="totalTrees">0</strong>
+Total Trees Planted: <strong id="totalTrees"></strong>
 </div>
 
 <div id="map"></div>
 
+<button onclick="logout()">Logout</button>
+
+</div>
+
 <script>
 
-// Initialize map (center of India)
-var map = L.map('map').setView([20.5937, 78.9629], 5);
+const ADMIN_PASSWORD = "admin123"; // change if needed
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+function adminLogin(){
+let pass=document.getElementById("adminPass").value;
 
-let usersData = JSON.parse(localStorage.getItem("usersData")) || {};
-
-let totalUsers = 0;
-let totalTrees = 0;
-
-for(let user in usersData){
-
-    totalUsers++;
-
-    usersData[user].history.forEach(tree => {
-
-        totalTrees++;
-
-        if(tree.lat && tree.lon){
-
-            // Create custom green points badge
-            let greenIcon = L.divIcon({
-                className: 'custom-icon',
-                html: `<div class="point-label">${tree.points} 💚</div>`
-            });
-
-            let marker = L.marker([tree.lat, tree.lon], {
-                icon: greenIcon
-            }).addTo(map);
-
-            marker.bindPopup(`
-                <div style="text-align:center; color:black;">
-                    <strong>${tree.name}</strong><br>
-                    User: ${user}<br>
-                    Green Points: ${tree.points}<br>
-                    Date: ${tree.date}<br><br>
-                    <img src="${tree.image}" 
-                         width="150" 
-                         style="border-radius:8px;">
-                </div>
-            `);
-        }
-
-    });
+if(pass===ADMIN_PASSWORD){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("adminContent").style.display="block";
+loadMap();
+}else{
+alert("Wrong Password");
+}
 }
 
-document.getElementById("totalUsers").innerText = totalUsers;
-document.getElementById("totalTrees").innerText = totalTrees;
+function logout(){
+location.reload();
+}
+
+function loadMap(){
+
+let plants = JSON.parse(localStorage.getItem("plants")) || [];
+
+document.getElementById("totalTrees").innerText = plants.length;
+
+if(plants.length === 0){
+alert("No trees planted yet");
+return;
+}
+
+// Center map on first plant
+let map = L.map('map').setView([plants[0].lat, plants[0].lon], 15);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Add markers
+plants.forEach(p=>{
+L.marker([p.lat, p.lon]).addTo(map)
+.bindPopup(
+"<b>User:</b> " + p.user +
+"<br><b>Tree:</b> " + p.tree +
+"<br><b>Date:</b> " + p.date
+);
+});
+
+}
 
 </script>
 
