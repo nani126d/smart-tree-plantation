@@ -1,70 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Tree Plantation - Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Andhra Loyola - Smart Tree Plantation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Styles -->
   <style>
     body {
-      margin:0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      color: white;
+      margin: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
       text-align: center;
       overflow-x: hidden;
     }
+
     h1 {
-      margin-top: 20px;
-      font-size: 28px;
+      margin-top: 30px;
+      font-size: 36px;
       animation: fadeIn 2s;
+      letter-spacing: 1px;
     }
+
     .card {
       background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
-      margin: 20px auto;
+      backdrop-filter: blur(12px);
+      padding: 25px;
+      margin: 25px auto;
       width: 90%;
-      max-width: 400px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,255,0,0.4);
+      max-width: 450px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,255,0,0.5);
       animation: slideIn 1.5s;
+      transition: transform 0.3s;
     }
+
+    .card:hover { transform: scale(1.02); }
+
     input {
-      padding: 10px;
+      padding: 12px;
       width: 80%;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
-      margin: 10px 0;
+      margin: 12px 0;
+      font-size: 16px;
     }
+
     button {
-      padding: 10px 20px;
+      padding: 12px 22px;
+      margin: 8px;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       background: #00c853;
-      color: white;
+      color: #fff;
       font-size: 16px;
       cursor: pointer;
-      margin: 5px;
       transition: 0.3s;
     }
+
     button:hover {
       background: #00e676;
       transform: scale(1.05);
     }
+
     .stats {
-      font-size: 18px;
-      margin-top: 10px;
+      font-size: 20px;
+      margin-top: 20px;
       animation: fadeIn 2s;
     }
-    @keyframes fadeIn {
-      from {opacity:0;}
-      to {opacity:1;}
+
+    #locationText {
+      margin: 8px 0;
+      font-style: italic;
+      font-size: 14px;
     }
-    @keyframes slideIn {
-      from {transform: translateY(50px); opacity:0;}
-      to {transform: translateY(0); opacity:1;}
-    }
+
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    @keyframes slideIn { from {transform: translateY(60px); opacity:0;} to {transform: translateY(0); opacity:1;} }
   </style>
 </head>
 
@@ -74,10 +87,14 @@
 
 <div class="card">
   <h3>Plant a Tree</h3>
+  <input type="text" id="userName" placeholder="Enter Your Name"><br>
   <input type="text" id="treeName" placeholder="Enter Tree Name"><br>
+
   <button onclick="getLocation()">Get Live Location</button>
   <p id="locationText">Location not captured</p>
+
   <button onclick="plantTree()">Plant Tree</button><br>
+
   <button onclick="window.location.href='leaderboard.html'">View Leaderboard</button>
   <button onclick="window.location.href='certificate.html'">Download Certificate</button>
 </div>
@@ -92,6 +109,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+// 🔥 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
   authDomain: "smart-tree-plantation-alc.firebaseapp.com",
@@ -101,16 +119,20 @@ const firebaseConfig = {
   appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Variables to store live location
+// Live location
 let currentLat = null;
 let currentLon = null;
 
-// Get live location
+// Get Live Location
 function getLocation(){
+  if(!navigator.geolocation){
+    alert("Geolocation is not supported by your browser");
+    return;
+  }
+
   navigator.geolocation.getCurrentPosition(function(position){
     currentLat = position.coords.latitude;
     currentLon = position.coords.longitude;
@@ -121,19 +143,23 @@ function getLocation(){
   });
 }
 
-// Plant tree
+// Plant Tree
 function plantTree(){
+  const userName = document.getElementById("userName").value;
   const treeName = document.getElementById("treeName").value;
-  if(treeName === ""){
-    alert("Enter tree name");
+
+  if(userName === "" || treeName === ""){
+    alert("Enter your name and tree name");
     return;
   }
+
   if(currentLat === null){
     alert("Click Get Live Location first");
     return;
   }
 
   db.collection("plants").add({
+    user: userName,
     tree: treeName,
     latitude: currentLat,
     longitude: currentLon,
@@ -150,11 +176,11 @@ function plantTree(){
   });
 }
 
-// Load total trees & points
+// Load stats
 function loadStats(){
   db.collection("plants").get().then(snapshot=>{
-    let totalTrees = snapshot.size;
-    let totalPoints = totalTrees * 10;
+    const totalTrees = snapshot.size;
+    const totalPoints = totalTrees * 10;
     document.getElementById("totalTrees").innerText = totalTrees;
     document.getElementById("totalPoints").innerText = totalPoints;
   });
