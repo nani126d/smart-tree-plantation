@@ -1,134 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Tree Plantation - Dashboard</title>
+  <title>Smart Tree Plantation - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
-    color:white;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color: white;
+      text-align: center;
+    }
 
-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 30px;
-    background:rgba(0,0,0,0.3);
-}
+    h1 {
+      margin-top: 20px;
+      font-size: 28px;
+    }
 
-header img{
-    height:45px;
-}
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,255,0,0.4);
+    }
 
-.container{
-    width:90%;
-    max-width:900px;
-    margin:40px auto;
-}
+    input {
+      padding: 10px;
+      width: 80%;
+      border-radius: 8px;
+      border: none;
+      margin: 10px 0;
+    }
 
-.card{
-    background:rgba(255,255,255,0.1);
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:25px;
-}
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00c853;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-input{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border:none;
-    border-radius:6px;
-}
+    button:hover {
+      background: #00e676;
+      transform: scale(1.05);
+    }
 
-button{
-    padding:10px 20px;
-    border:none;
-    border-radius:20px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#16a34a;
-}
-
-.stats{
-    display:flex;
-    justify-content:space-around;
-    margin-top:15px;
-}
-
-.history-item{
-    background:rgba(255,255,255,0.15);
-    padding:8px;
-    border-radius:8px;
-    margin-bottom:8px;
-}
-</style>
+    .stats {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-<div style="display:flex;align-items:center;gap:10px;">
-<img src="Logo.png">
-<h3>Smart Tree Plantation</h3>
-</div>
-<div>
-Welcome, <span id="username"></span>
-</div>
-</header>
-
-<div class="container">
+<h1>🌳 Smart Tree Plantation</h1>
 
 <div class="card">
-<h2>Plant New Tree 🌱</h2>
-<input type="text" id="treeName" placeholder="Tree Name">
-<input type="text" id="treeLocation" placeholder="Location">
-<button id="plantBtn">Plant Tree</button>
+  <h3>Plant a Tree</h3>
+  <input type="text" id="treeName" placeholder="Enter Tree Name">
+  <br>
+  <button onclick="plantTree()">Plant Tree</button>
 </div>
 
-<div class="card">
-<h2>Your Impact 📊</h2>
-<div class="stats">
-<div>Total Trees 🌳<br><strong id="treeCount">0</strong></div>
-<div>Green Points 💚<br><strong id="greenPoints">0</strong></div>
-</div>
+<div class="card stats">
+  <p>Total Trees Planted: <span id="totalTrees">0</span></p>
+  <p>Total Green Points: <span id="totalPoints">0</span></p>
 </div>
 
-<div class="card">
-<h2>Plantation History 🌿</h2>
-<div id="history"></div>
-</div>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-</div>
+<script>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+// 🔥 Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDJMDruut0JSaXPNQFtJunzMV9n0pDe9Tc",
   authDomain: "smart-tree-plantation-alc.firebaseapp.com",
   projectId: "smart-tree-plantation-alc",
   storageBucket: "smart-tree-plantation-alc.firebasestorage.app",
   messagingSenderId: "1079228357775",
-  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa"
+  appId: "1:1079228357775:web:825a35b9903b8fae86e4fa",
+  measurementId: "G-LWRSXNFQ0K"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-window.plantTree = async function() {
+// 🌳 Plant Tree Function
+function plantTree() {
 
   const treeName = document.getElementById("treeName").value;
 
@@ -137,28 +106,45 @@ window.plantTree = async function() {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(async (position)=>{
+  navigator.geolocation.getCurrentPosition(function(position){
 
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
 
-    await addDoc(collection(db,"plants"),{
+    db.collection("plants").add({
       tree: treeName,
-      lat: lat,
-      lon: lon,
+      latitude: lat,
+      longitude: lon,
       points: 10,
       date: new Date().toLocaleString()
+    })
+    .then(()=>{
+      alert("Tree Planted Successfully 🌳");
+      document.getElementById("treeName").value="";
+      loadStats();
+    })
+    .catch((error)=>{
+      alert("Error: " + error.message);
     });
 
-    alert("Tree Planted Successfully 🌳");
-
-    document.getElementById("treeName").value="";
-
-  }, ()=>{
+  }, function(){
     alert("Location permission denied");
   });
-
 }
+
+// 📊 Load Total Trees & Points
+function loadStats(){
+  db.collection("plants").get().then((snapshot)=>{
+    let totalTrees = snapshot.size;
+    let totalPoints = totalTrees * 10;
+
+    document.getElementById("totalTrees").innerText = totalTrees;
+    document.getElementById("totalPoints").innerText = totalPoints;
+  });
+}
+
+// Load stats on page load
+loadStats();
 
 </script>
 
