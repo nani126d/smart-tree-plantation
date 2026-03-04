@@ -1,181 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Certificate | Smart Tree Plantation</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;700&display=swap" rel="stylesheet">
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
-body{
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#134e5e,#71b280);
-padding:20px;
-}
-
-.certificate{
-background:white;
-width:900px;
-max-width:100%;
-padding:50px 40px;
-border-radius:20px;
-box-shadow:0 20px 40px rgba(0,0,0,0.3);
-text-align:center;
-position:relative;
-animation:fadeIn 1s ease;
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:scale(0.9);}
-to{opacity:1;transform:scale(1);}
-}
-
-.border{
-position:absolute;
-top:15px;
-left:15px;
-right:15px;
-bottom:15px;
-border:5px solid #22c55e;
-border-radius:15px;
-pointer-events:none;
-}
-
-h1{
-font-size:32px;
-color:#134e5e;
-margin-bottom:10px;
-}
-
-h2{
-font-size:20px;
-color:#555;
-margin-bottom:30px;
-}
-
-.name{
-font-size:28px;
-font-weight:700;
-color:#16a34a;
-margin:20px 0;
-}
-
-.details{
-font-size:18px;
-margin:10px 0;
-color:#333;
-}
-
-.footer{
-margin-top:40px;
-display:flex;
-justify-content:space-between;
-font-size:14px;
-color:#444;
-}
-
-button{
-margin-top:30px;
-padding:10px 20px;
-border:none;
-border-radius:25px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-font-weight:600;
-transition:0.3s;
-}
-
-button:hover{
-background:#16a34a;
-transform:scale(1.05);
-}
-
-.back{
-background:#0ea5e9;
-margin-left:10px;
-}
-
-.back:hover{
-background:#0284c7;
-}
-</style>
+  <title>Smart Tree Plantation - Certificate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{
+      font-family: Arial; 
+      text-align:center; 
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:white;
+      padding:20px;
+    }
+    h1{ margin-top:20px; animation: fadeIn 2s;}
+    .card{
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding:20px;
+      margin:20px auto;
+      width:90%;
+      max-width:500px;
+      border-radius:15px;
+      box-shadow:0 0 20px rgba(0,255,0,0.4);
+      animation: slideIn 1.5s;
+    }
+    input{ padding:10px; width:80%; margin:10px 0; border-radius:8px; border:none;}
+    button{ padding:10px 20px; border:none; border-radius:8px; background:#00c853; color:white; cursor:pointer; margin:5px;}
+    button:hover{ background:#00e676; transform:scale(1.05);}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes slideIn{from{transform: translateY(50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  </style>
 </head>
-
 <body>
 
-<div class="certificate" id="certificateArea">
+<h1>🌳 Smart Tree Plantation Certificate</h1>
 
-<div class="border"></div>
-
-<h1>Certificate of Appreciation</h1>
-<h2>Smart Tree Plantation Initiative</h2>
-
-<p>This certificate is proudly presented to</p>
-
-<div class="name" id="certName"></div>
-
-<div class="details">
-For actively participating in the Green Technology Initiative<br>
-at <strong>Andhra Loyola College – CSE Department</strong>
+<div class="card">
+  <input type="text" id="userName" placeholder="Enter Your Name"><br>
+  <input type="text" id="treeName" placeholder="Enter Tree Name"><br>
+  <button onclick="generateCertificate()">Generate Certificate</button>
 </div>
 
-<div class="details">
-Trees Planted: <strong id="certTrees"></strong><br>
-Green Points Earned: <strong id="certPoints"></strong>
-</div>
-
-<div class="footer">
-<div>Date: <span id="certDate"></span></div>
-<div>Authorized Signature</div>
-</div>
-
-<button onclick="downloadPDF()">Download PDF</button>
-<button class="back" onclick="goDashboard()">Back</button>
-
-</div>
-
+<!-- jsPDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+function generateCertificate(){
+  const { jsPDF } = window.jspdf;
+  const userName = document.getElementById("userName").value;
+  const treeName = document.getElementById("treeName").value;
+  const date = new Date().toLocaleDateString();
 
-// Get current user
-let user = localStorage.getItem("currentUser");
-if(!user){
-window.location.href="index.html";
+  if(userName === "" || treeName === ""){
+    alert("Please enter all details");
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  doc.setFontSize(24);
+  doc.text("🌳 Smart Tree Plantation 🌳", 105, 30, null, null, "center");
+
+  doc.setFontSize(20);
+  doc.text("Certificate of Participation", 105, 50, null, null, "center");
+
+  doc.setFontSize(16);
+  doc.text(`This certificate is proudly presented to`, 105, 70, null, null, "center");
+
+  doc.setFontSize(22);
+  doc.text(`${userName}`, 105, 85, null, null, "center");
+
+  doc.setFontSize(16);
+  doc.text(`for planting the tree "${treeName}"`, 105, 100, null, null, "center");
+
+  doc.text(`Date: ${date}`, 105, 120, null, null, "center");
+
+  doc.setFontSize(12);
+  doc.text("Thank you for contributing to a greener planet!", 105, 140, null, null, "center");
+
+  doc.save(`Certificate_${userName}_${treeName}.pdf`);
 }
-
-// Get plants data
-let plants = JSON.parse(localStorage.getItem("plants")) || [];
-
-// Filter user plants
-let userPlants = plants.filter(p => p.user === user);
-
-let totalTrees = userPlants.length;
-let totalPoints = totalTrees * 10;
-
-document.getElementById("certName").innerText = user;
-document.getElementById("certTrees").innerText = totalTrees;
-document.getElementById("certPoints").innerText = totalPoints;
-document.getElementById("certDate").innerText = new Date().toLocaleDateString();
-
-function downloadPDF(){
-window.print();
-}
-
-function goDashboard(){
-window.location.href="dashboard.html";
-}
-
 </script>
 
 </body>
